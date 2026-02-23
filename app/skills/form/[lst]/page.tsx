@@ -31,10 +31,10 @@ export default function SkillsChecklists() {
   const router = useRouter();
 
   useEffect(() => {
-    if (!loading && !user) {
+    if (!authLoading && !user) {
       router.push("/login");
     }
-  }, [user, authLoading, router]);
+  }, [user, authLoading]);
 
   const { register, handleSubmit } = useForm();
 
