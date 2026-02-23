@@ -36,11 +36,12 @@ export default function SkillsChecklists() {
 
 
   useEffect(() => {
+    if (!lst || authLoading) return;
     axios
       .get(`https://adextravelnursing.com/api_skills_checklists.php?list=${lst}`)
       .then((res) => setQuestions(res.data))
       .finally(() => setLoading(false));
-  }, [lst]);
+  }, [lst, authLoading]);
 
   // 🔥 Group questions by heading
   const groupedQuestions = questions.reduce((acc: any, q) => {
@@ -59,20 +60,15 @@ export default function SkillsChecklists() {
     });
   };
 
-  if (authLoading) {
+  if (authLoading || loading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
         <div className="w-12 h-12 border-4 border-gray-300 border-t-red-700 rounded-full animate-spin"></div>
       </div>
     );
   }
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center min-h-screen">
-        <div className="w-12 h-12 border-4 border-gray-300 border-t-red-700 rounded-full animate-spin"></div>
-      </div>
-    );
-  }
+
+  if (!user) return null;
 
   return (
     <div>
