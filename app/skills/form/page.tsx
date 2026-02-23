@@ -29,7 +29,7 @@ export default function SkillsChecklists() {
     if (!loading && !user) {
       router.push("/login");
     }
-  }, [user, loading]);
+  }, [user, authLoading, router]);
 
   const { register, handleSubmit } = useForm();
 

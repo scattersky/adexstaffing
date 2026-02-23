@@ -21,7 +21,7 @@ export default function CheckLists() {
     if (!loading && !user) {
       router.push("/login");
     }
-  }, [user, loading]);
+  }, [user, authLoading, router]);
 
   useEffect(() => {
     axios
