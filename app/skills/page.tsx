@@ -66,7 +66,7 @@ export default function CheckLists() {
                     translateDepth={8}
                     rotateDepth={4}
                   >
-                  <Link href={`/skills/form?lst=${checklist.list}`} className="p-5 bg-white rounded-2xl shadow-sm cursor-pointer hover:shadow-md transition hover:outline-red-700 hover:outline block hover:shadow-red-900">
+                  <Link href={`/skills/form/${checklist.list}`} className="p-5 bg-white rounded-2xl shadow-sm cursor-pointer hover:shadow-md transition hover:outline-red-700 hover:outline block hover:shadow-red-900">
                       { checklist.list }
                   </Link>
                   </CometCard>

@@ -8,6 +8,7 @@ import Header from "@/app/sections/Header";
 import InnerPageTitle from "@/app/sections/InnerPageTitle";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 
 type Question = {
   id: number;
@@ -18,8 +19,8 @@ type Question = {
 
 export default function SkillsChecklists() {
 
-  const searchParams = useSearchParams();
-  const lst = searchParams.get("lst") || "";
+  const params = useParams();
+  const lst = params.lst as string;
   if (!lst) {
     return null;
   }
