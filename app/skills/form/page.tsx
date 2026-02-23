@@ -17,8 +17,12 @@ type Question = {
 };
 
 export default function SkillsChecklists() {
+
   const searchParams = useSearchParams();
   const lst = searchParams.get("lst") || "";
+  if (!lst) {
+    return null;
+  }
 
   const [questions, setQuestions] = useState<Question[]>([]);
   const [loading, setLoading] = useState(true);
@@ -36,12 +40,12 @@ export default function SkillsChecklists() {
 
 
   useEffect(() => {
-    if (!lst || authLoading) return;
+    if (!lst) return;
     axios
       .get(`https://adextravelnursing.com/api_skills_checklists.php?list=${lst}`)
       .then((res) => setQuestions(res.data))
       .finally(() => setLoading(false));
-  }, [lst, authLoading]);
+  }, [lst]);
 
   // 🔥 Group questions by heading
   const groupedQuestions = questions.reduce((acc: any, q) => {
