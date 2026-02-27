@@ -1,13 +1,17 @@
 'use client'
-import {useSearchParams} from "next/navigation";
+import {useParams, useSearchParams} from "next/navigation";
 
 type Props = {
   title: string;
   subHeading: string;
 };
 export default function InnerPageTitle({ title, subHeading }: Props) {
-  const searchParams = useSearchParams();
-  const lst = searchParams.get("lst") || "";
+
+  const params = useParams();
+  const lst = params.lst as string;
+  if (!lst) {
+    return null;
+  }
 
   return (
     <div className="relative flex flex-col lg:flex-col-reverse py-0 md:py-4 lg:pt-0 lg:pb-0" >
