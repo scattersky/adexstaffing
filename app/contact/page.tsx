@@ -1,9 +1,8 @@
 'use client'
-
+export const dynamic = "force-dynamic";
 import { useState } from "react";
 import axios from "axios";
 import InnerPageTitle from "@/app/sections/InnerPageTitle";
-import ScrollProgressBar from "@/components/ScrollProgressBar";
 
 export default function ContactPage() {
   const [form, setForm] = useState({
@@ -41,6 +40,8 @@ export default function ContactPage() {
 
     setLoading(false);
   };
+
+
 
   return (
     <div>
@@ -112,8 +113,6 @@ export default function ContactPage() {
         </section>
       </div>
     </div>
-
-
 
   );
 }
