@@ -27,7 +27,7 @@ export default function ContactPage() {
     setLoading(true);
     try {
       await axios.post(
-        "https://adextravelnursing.com/api_contact.php",
+        "https://adextravelnursing.com/api_contact_send.php",
         form
       );
       setSuccess(true);
