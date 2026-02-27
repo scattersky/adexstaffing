@@ -9,9 +9,9 @@ export default function InnerPageTitle({ title, subHeading }: Props) {
 
   const params = useParams();
   const lst = params.lst as string;
-  if (!lst) {
-    return null;
-  }
+  // if (!lst) {
+  //   return null;
+  // }
 
   return (
     <div className="relative flex flex-col lg:flex-col-reverse py-0 md:py-4 lg:pt-0 lg:pb-0" >
