@@ -48,8 +48,7 @@ export default function CheckLists() {
 
   return (
     <div>
-      <Header />
-      <InnerPageTitle title='Skills Checklists'/>
+      <InnerPageTitle title='Skills Checklists' subHeading=''/>
       <div className="bg-gray-100 pt-2 pb-12">
         <section className="mt-12 max-w-5xl mx-auto md:px-8">
           <div>

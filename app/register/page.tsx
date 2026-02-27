@@ -212,11 +212,11 @@ export default function Register() {
               className="w-full border p-2 rounded"
             >
               <option value="">Select Years of Experience</option>
-              <option value="0-1">0-1 Years</option>
-              <option value="2-3">2-3 Years</option>
-              <option value="4-5">4-5 Years</option>
-              <option value="6-10">6-10 Years</option>
-              <option value="10+">10+ Years</option>
+              <option value="0-1 Years">0-1 Years</option>
+              <option value="2-3 Years">2-3 Years</option>
+              <option value="4-5 Years">4-5 Years</option>
+              <option value="6-10 Years">6-10 Years</option>
+              <option value="10+ Years">10+ Years</option>
             </select>
             {errors.yearsExperience && <p className="text-red-500">{errors.yearsExperience.message}</p>}
 

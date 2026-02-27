@@ -1,4 +1,4 @@
-import { initializeApp } from "firebase/app";
+import {getApp, getApps, initializeApp} from "firebase/app";
 import { getAuth } from "firebase/auth";
 
 const firebaseConfig = {
@@ -11,6 +11,9 @@ const firebaseConfig = {
   measurementId: "G-NXQDJXP450"
 };
 
-const app = initializeApp(firebaseConfig);
+// Prevent re-initializing in Next.js
+const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 
-export const auth = getAuth(app);
+const auth = getAuth(app);
+
+export { app, auth };

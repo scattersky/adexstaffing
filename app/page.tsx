@@ -7,7 +7,7 @@ import Jobs from "@/app/sections/Jobs";
 export default function Home() {
   return (
     <div className='w-full min-h-screen bg-white]'>
-      <Header />
+
       <Hero />
       <Jobs />
 

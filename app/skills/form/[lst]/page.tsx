@@ -9,6 +9,7 @@ import InnerPageTitle from "@/app/sections/InnerPageTitle";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 import { useParams } from "next/navigation";
+import ScrollProgressBar from "@/components/ScrollProgressBar";
 
 type Question = {
   id: number;
@@ -77,23 +78,23 @@ export default function SkillsChecklists() {
 
   return (
     <div>
-      <Header />
-      <InnerPageTitle title='Skills Checklists'/>
+      <InnerPageTitle title='Skills Checklists' subHeading=''/>
+      <ScrollProgressBar />
       <div className="bg-gray-100 pt-2 pb-12">
         <section className="mt-12 max-w-5xl mx-auto md:px-8">
 
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-10 bg-white rounded-lg p-8 shadow-lg">
-          <div>
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-10 ">
+          <div className='bg-white rounded-lg p-8 shadow-lg'>
             <h2 className="text-gray-800 text-3xl font-black">
-              {lst} Checklist
+              {decodeURIComponent(lst)} Skills Checklist
             </h2>
             <p className='text-md text-gray-700'>This assessment is for determining your experience in the below outlined clinical areas. This checklist will not be used as a determining factor in accepting your application for employment with ADEX Medical Staffing, LLC.</p>
 
           </div>
 
           {Object.entries(groupedQuestions).map(([heading, items]: any) => (
-            <div key={heading}>
+            <div key={heading} className='bg-white rounded-lg p-8 shadow-lg'>
               <h2 className="text-xl font-black mb-6 border-b pb-2">
                 {heading}
               </h2>
@@ -124,6 +125,7 @@ export default function SkillsChecklists() {
                           <label key={opt.value} className="flex items-center gap-1 text-xs">
                             <input
                               type="radio"
+                              required
                               value={opt.value}
                               {...register(`q_${question.id}_proficiency`)}
                             />
@@ -148,6 +150,7 @@ export default function SkillsChecklists() {
                           <label key={opt.value} className="flex items-center gap-1 text-xs">
                             <input
                               type="radio"
+                              required
                               value={opt.value}
                               {...register(`q_${question.id}_frequency`)}
                             />
