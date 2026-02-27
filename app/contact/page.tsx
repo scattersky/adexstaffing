@@ -25,19 +25,16 @@ export default function ContactPage() {
   const handleSubmit = async (e: any) => {
     e.preventDefault();
     setLoading(true);
-
     try {
       await axios.post(
         "https://adextravelnursing.com/api_contact.php",
         form
       );
-
       setSuccess(true);
       setForm({ name: "", phone: "", email: "", message: "" });
     } catch (err) {
       alert("Something went wrong.");
     }
-
     setLoading(false);
   };
 
@@ -64,7 +61,7 @@ export default function ContactPage() {
                 name="name"
                 placeholder="Full Name"
                 required
-                value={form.name}
+                value={form?.name}
                 onChange={handleChange}
                 className="w-full border p-2 rounded"
               />
@@ -74,7 +71,7 @@ export default function ContactPage() {
                 name="phone"
                 placeholder="Phone Number"
                 required
-                value={form.phone}
+                value={form?.phone}
                 onChange={handleChange}
                 className="w-full border p-2 rounded"
               />
@@ -84,7 +81,7 @@ export default function ContactPage() {
                 name="email"
                 placeholder="Email Address"
                 required
-                value={form.email}
+                value={form?.email}
                 onChange={handleChange}
                 className="w-full border p-2 rounded"
               />
@@ -94,7 +91,7 @@ export default function ContactPage() {
                 placeholder="Your Message"
                 required
                 rows={5}
-                value={form.message}
+                value={form?.message}
                 onChange={handleChange}
                 className="w-full border p-2 rounded"
               />
