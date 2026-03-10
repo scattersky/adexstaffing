@@ -361,7 +361,7 @@ export default function Dashboard() {
                     )}
                   </div>
                   <div className='w-full border border-gray-300 rounded-lg p-1'>
-           
+
                   </div>
                 </div>
               )}

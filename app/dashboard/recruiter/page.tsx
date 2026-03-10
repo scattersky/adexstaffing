@@ -152,7 +152,7 @@ export default function RecruiterDashboard() {
     setAddCandidateFormLoading(true);
     try {
       await axios.post(
-        'https://adextravelnursing.com.com/api_add_new_candidate.php',
+        'https://adextravelnursing.com/api_add_new_candidate.php',
         addCandidateForm
       );
     } catch (err:any) {
