@@ -11,7 +11,6 @@ import {IoFileTrayFullOutline, IoSettingsSharp} from "react-icons/io5";
 import {ImLifebuoy} from "react-icons/im";
 import {ToastContainer, toast, Slide} from 'react-toastify';
 import Link from "next/link";
-import FileViewer from 'react-file-viewer';
 
 
 interface UserProfile {
@@ -39,8 +38,7 @@ export default function Dashboard() {
 
   const [file, setFile] = useState<File | null>(null);
   const [resumeUrl, setResumeUrl] = useState<string | null>(null);
-  const doc = 'https://adextravelnursing.com/uploads/resumes/rQszomfz1jWsyBLXsIS1rWotd173_1772206683.docx';
-  const type = "docx";
+
 
   // useEffect(() => {
   //   if (role && role !== "candidate") {
@@ -363,10 +361,7 @@ export default function Dashboard() {
                     )}
                   </div>
                   <div className='w-full border border-gray-300 rounded-lg p-1'>
-                    <FileViewer
-                      fileType={type}
-                      filePath={doc}
-                    />
+           
                   </div>
                 </div>
               )}
