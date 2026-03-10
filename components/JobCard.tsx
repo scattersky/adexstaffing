@@ -4,10 +4,12 @@ import moment from "moment/moment";
 import {SaveJobButton} from "@/components/SaveJobButton";
 import Link from "next/link";
 import {AiOutlineSend} from "react-icons/ai";
-import {RiFolderAddLine} from "react-icons/ri";
+import {RiFolderAddLine, RiLock2Fill} from "react-icons/ri";
 import {Slide, toast, ToastContainer} from "react-toastify";
 import {BsInfoCircle} from "react-icons/bs";
 import {ImInfo} from "react-icons/im";
+import renderHTML from 'react-render-html';
+import {useRouter} from "next/navigation";
 
 
 export function JobCard({
@@ -22,6 +24,7 @@ export function JobCard({
   const { user } = useAuth();
 
   const isSaved = savedJobIds.includes(String(job.job_id));
+  const router = useRouter();
 
   const handleSave = async () => {
     if (!user) {
@@ -55,6 +58,10 @@ export function JobCard({
     transition: Slide,
   });
 
+  const handleGoToLogin = () => {
+    router.push('../login');
+  }
+
   const trimtext = (description:any, limit:any ) => {
     const limitedDescription =
       description.length > limit
@@ -75,10 +82,14 @@ export function JobCard({
                 {job.job_title}
               </h3>
               </Link>
-              <p className="text-gray-500 mt-2 pr-2 text-xs">
-                {trimtext( job.job_description,350)}
+              <div className='h-37.5 relative overflow-hidden w-full'>
+                <div className="text-gray-500 mt-2 pr-2 text-xs">
+                  {/*{trimtext( job.job_description,350)}*/}
+                  {renderHTML(job.job_description)}
+                </div>
+                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-white to-transparent h-16 w-full"></div>
+              </div>
 
-              </p>
             </div>
             <div className="mt-5 space-y-4 text-sm sm:mt-0 sm:space-y-2">
                                             <span className="flex items-center text-gray-500">
@@ -116,19 +127,26 @@ export function JobCard({
                 <ImInfo  color="white" size={15}/>
                 <span className="flex items-center text-white text-xs leading-1">View Details</span>
               </Link>
-              <button
-                onClick={handleSave}
-                disabled={isSaved}
-
-              className={`flex items-center justify-center gap-1 text-center px-4 py-2 border rounded-md transition cursor-pointer text-[13px] duration-700 text-white ${
-                  isSaved
-                    ? "bg-gray-500 cursor-not-allowed"
-                    : " border-sky-800 hover:border-sky-700 hover:bg-sky-700 bg-sky-800"
-                }`}
-              >
-                <RiFolderAddLine color="white" size={16} />
-                <span className="flex items-center text-white text-xs leading-1">{isSaved ? "Job Saved" : "Save to My Jobs"}</span>
+              <button onClick={handleGoToLogin} className='flex items-center justify-center gap-1 text-center px-4 py-2 border bg-gray-500 cursor-pointer duration-700 text-[13px] rounded-md transition '>
+                <RiLock2Fill color="white" size={16}  />
+                <span className="flex items-center text-white text-xs">Login To Save Job</span>
               </button>
+              {user && (
+                <button
+                  onClick={handleSave}
+                  disabled={isSaved}
+
+                  className={`flex items-center justify-center gap-1 text-center px-4 py-2 border rounded-md transition cursor-pointer text-[13px] duration-700 text-white ${
+                    isSaved
+                      ? "bg-gray-500 cursor-not-allowed"
+                      : " border-sky-800 hover:border-sky-700 hover:bg-sky-700 bg-sky-800"
+                  }`}
+                >
+                  <RiFolderAddLine color="white" size={16} />
+                  <span className="flex items-center text-white text-xs leading-1">{isSaved ? "Job Saved" : "Save to My Jobs"}</span>
+                </button>
+              )}
+
               <Link href={'https://adextravelnursing.com/'} className='flex items-center justify-center gap-1 text-center px-4 py-2 border border-red-700 hover:border-red-600  bg-red-700 rounded-md hover:bg-red-600 duration-700 transition cursor-pointer text-[13px]'>
                 <AiOutlineSend color="white" size={16}  />
                 <span className="flex items-center text-white text-xs">Apply Now</span>

@@ -9,6 +9,11 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@fullcalendar/core": "^6.1.20",
+    "@fullcalendar/daygrid": "^6.1.20",
+    "@fullcalendar/interaction": "^6.1.20",
+    "@fullcalendar/react": "^6.1.20",
+    "@headlessui/react": "^2.2.9",
     "@konforti/react-truncate": "^1.1.0",
     "axios": "^1.13.5",
     "class-variance-authority": "^0.7.1",
@@ -22,10 +27,14 @@
     "primereact": "^10.9.7",
     "radix-ui": "^1.4.3",
     "react": "19.2.3",
+    "react-docs-preview": "^1.0.3",
     "react-dom": "19.2.3",
+    "react-file-viewer": "^1.2.1",
     "react-hook-form": "^7.71.2",
     "react-icons": "^5.5.0",
+    "react-render-html": "^0.6.0",
     "react-router-dom": "^7.13.0",
+    "react-select": "^5.10.2",
     "react-toastify": "^11.0.5",
     "simplex-noise": "^4.0.3",
     "tailwind-merge": "^3.5.0"

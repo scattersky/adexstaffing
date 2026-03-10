@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import {useParams, useRouter} from "next/navigation";
 import axios from "axios";
 import InnerPageTitle from "@/app/sections/InnerPageTitle";
 import {FaClipboardList, FaRegTrashAlt} from "react-icons/fa";
@@ -15,14 +15,23 @@ import Link from "next/link";
 import {RiFolderAddLine} from "react-icons/ri";
 import {useAuth} from "@/context/AuthContext";
 import {ToastContainer, toast, Slide} from 'react-toastify';
+import renderHTML from 'react-render-html';
 
 export default function SingleJobPage() {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
+  const router = useRouter();
   const [savedJobIds, setSavedJobIds] = useState<string[]>([]);
   const { id } = useParams();
   const [job, setJob] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const isSaved = savedJobIds.includes(String(job?.job_id));
+
+  useEffect(() => {
+    if (!authLoading && !user) {
+      router.push("/login");
+    }
+  }, [user, authLoading]);
+
   useEffect(() => {
     if (!id) return;
 
@@ -142,7 +151,7 @@ export default function SingleJobPage() {
                 </h3>
                 <hr className='bg-black w-full h-0.5 mb-3 opacity-20'/>
                 <p className="text-gray-600 text-sm mb-4">
-                  {job.job_description}
+                  {renderHTML(job.job_description)}
                 </p>
               </div>
             </div>

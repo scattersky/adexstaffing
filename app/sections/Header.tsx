@@ -24,7 +24,7 @@ export default function Header() {
     await signOut(auth);
   };
   return (
-    <div className="px-4 py-5 mx-auto sm:max-w-xl md:max-w-full lg:max-w-screen-xl md:px-24 lg:px-8">
+    <div className="px-4 py-5 mx-auto sm:max-w-xl md:max-w-full lg:max-w-fulll md:px-24 lg:px-8">
       <div className="relative flex items-center justify-between">
         <a
           href="/"
@@ -49,18 +49,23 @@ export default function Header() {
               </div>
             </Link>
           </li>
-          <li>
-            <Link
-              href={{
-                pathname: '/skills'
-              }}
-              className='cursor-pointer'
-            >
-              <div className='flex flex-row gap-2 items-center cursor-pointer font-normal text-gray-800 text-[15px]'>
-                Skills Checklists
-              </div>
-            </Link>
-          </li>
+
+          {!loading && user && (
+            <>
+              <li>
+                <Link
+                  href={{
+                    pathname: '/skills'
+                  }}
+                  className='cursor-pointer'
+                >
+                  <div className='flex flex-row gap-2 items-center cursor-pointer font-normal text-gray-800 text-[15px]'>
+                    Skills Checklists
+                  </div>
+                </Link>
+              </li>
+            </>
+          )}
           {!loading && !user && (
             <>
               <li>

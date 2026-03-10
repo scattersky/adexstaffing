@@ -1,16 +1,11 @@
 "use client"
 import {useEffect, useState, useRef} from "react";
 import axios from "axios";
-import moment from 'moment';
-import Link from "next/link";
-import { RiFolderAddLine } from "react-icons/ri";
-import { AiOutlineSend } from "react-icons/ai";
 import { useAuth } from "@/context/AuthContext";
-import {SaveJobButton} from "@/components/SaveJobButton";
 import {JobCard} from "@/components/JobCard";
 import {ToastContainer, toast, Slide} from 'react-toastify';
 
-;
+
 
 
 export default function Jobs() {

@@ -13,6 +13,8 @@ interface RegisterFormInputs {
   email: string;
   password: string;
   phone: string;
+  city: string;
+  state: string;
   yearsExperience: string;
   specialty: string[];
 }
@@ -20,6 +22,7 @@ interface RegisterFormInputs {
 export default function Register() {
   // const [specialtyOptions, setSpecialtyOptions] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [role, setRole] = useState<"candidate" | "recruiter">("candidate");
   const specialtyOptions = [,
     "Burn ICU",
     "CVICU",
@@ -149,7 +152,10 @@ export default function Register() {
         last_name: data.lastName,
         email: data.email,
         phone: data.phone,
+        city: data.city,
+        state: data.state,
         specialty: data.specialty,
+        role: data.role,
         years_experience: data.yearsExperience,
       });
 
@@ -165,77 +171,152 @@ export default function Register() {
   return (
     <div className='flex justify-center items-center min-h-screen bg-gray-200'>
       <div className="w-1/2 min-h-screen flex flex-col justify-center items-center">
-        <div className="max-w-md mx-auto space-y-4 bg-white rounded-md shadow-sm p-5">
-          <Image src="/adexlogo.webp" alt="logo" width={200} height={100} className='mx-auto mb-6'/>
-          <h2 className="text-xl font-black mb-2 text-gray-800">Create Account</h2>
+        <div className="max-w-lg w-full mx-auto space-y-4 bg-white rounded-md shadow-sm p-5">
+          {/*<Image src="/adexlogo.webp" alt="logo" width={200} height={100} className='mx-auto mb-3'/>*/}
+          <h2 className="text-3xl font-black mb-4 text-gray-600">Join Our Talent Community!</h2>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
 
-            <input
-              placeholder="First Name"
-              {...register("firstName", { required: "First name is required" })}
-              className="w-full border p-2 rounded"
-            />
-            {errors.firstName && <p className="text-red-500">{errors.firstName.message}</p>}
+            <div>
+              <label htmlFor="role" className="block text-md font-bold mb-1 text-gray-700">Account Type</label>
+              <div className="flex justify-start items-center space-x-2">
+                <label className="flex items-center gap-2">
+                  <input
+                    type="radio"
+                    value="candidate"
+                    checked={role === "candidate"}
+                    onChange={() => setRole("candidate")}
+                  />
+                  Candidate
+                </label>
+                <label className="flex items-center gap-2 ml-6">
+                  <input
+                    type="radio"
+                    value="recruiter"
+                    checked={role === "recruiter"}
+                    onChange={() => setRole("recruiter")}
+                  />
+                  Recruiter
+                </label>
+              </div>
+            </div>
 
-            <input
-              placeholder="Last Name"
-              {...register("lastName", { required: "Last name is required" })}
-              className="w-full border p-2 rounded"
-            />
-            {errors.lastName && <p className="text-red-500">{errors.lastName.message}</p>}
+            <div className="flex justify-between items-center space-x-2">
+              <div>
+                <label htmlFor="firstName" className="block text-md font-bold mb-1 text-gray-700">First Name</label>
+                <input
+                  placeholder="First Name"
+                  {...register("firstName", { required: "First name is required" })}
+                  className="w-full border p-2 rounded"
+                />
+                {errors.firstName && <p className="text-red-500">{errors.firstName.message}</p>}
+              </div>
+              <div>
+                <label htmlFor="lastName" className="block text-md font-bold mb-1 text-gray-700">Last Name</label>
+                <input
+                  placeholder="Last Name"
+                  {...register("lastName", { required: "Last name is required" })}
+                  className="w-full border p-2 rounded"
+                />
+                {errors.lastName && <p className="text-red-500">{errors.lastName.message}</p>}
+                </div>
+              </div>
 
-            <input
-              type="email"
-              placeholder="Email"
-              {...register("email", { required: "Email is required" })}
-              className="w-full border p-2 rounded"
-            />
-            {errors.email && <p className="text-red-500">{errors.email.message}</p>}
+            <div className="flex justify-between items-center space-x-2">
+              <div>
+              <label htmlFor="email" className="block text-md font-bold mb-1 text-gray-700">Email</label>
+              <input
+                type="email"
+                placeholder="Email"
+                {...register("email", { required: "Email is required" })}
+                className="w-full border p-2 rounded"
+              />
+              {errors.email && <p className="text-red-500">{errors.email.message}</p>}
+              </div>
 
-            <input
-              type="password"
-              placeholder="Password"
-              {...register("password", { required: "Password is required", minLength: 6 })}
-              className="w-full border p-2 rounded"
-            />
-            {errors.password && <p className="text-red-500">Password must be at least 6 characters</p>}
+              <div>
+                <label htmlFor="phone" className="block text-md font-bold mb-1 text-gray-700">Phone</label>
+                <input
+                  placeholder="Phone"
+                  {...register("phone")}
+                  className="w-full border p-2 rounded"
+                />
+              </div>
+            </div>
 
-            <input
-              placeholder="Phone"
-              {...register("phone")}
-              className="w-full border p-2 rounded"
-            />
+
+            <div className="flex justify-between items-center space-x-2">
+              <div>
+                <label htmlFor="password" className="block text-md font-bold mb-1 text-gray-700">Password</label>
+                <input
+                  type="password"
+                  {...register("password", { required: "Password is required", minLength: 6 })}
+                  className="w-full border p-2 rounded"
+                />
+                {errors.password && <p className="text-red-500">Password must be at least 6 characters</p>}
+              </div>
+            </div>
+
+            <div className="flex justify-between items-center space-x-2">
+              <div>
+                <label htmlFor="city" className="block text-md font-bold mb-1 text-gray-700">City</label>
+                <input
+                  placeholder="City"
+                  {...register("city", { required: "City is required" })}
+                  className="w-full border p-2 rounded"
+                />
+                {errors.city && <p className="text-red-500">{errors.city.message}</p>}
+              </div>
+
+              <div>
+                <label htmlFor="state" className="block text-md font-bold mb-1 text-gray-700">State</label>
+                <input
+                  placeholder="State"
+                  {...register("state", { required: "State is required" })}
+                  className="w-full border p-2 rounded"
+                />
+                {errors.state && <p className="text-red-500">{errors.state.message}</p>}
+              </div>
+            </div>
 
             {/* Years Experience Select */}
-            <select
-              {...register("yearsExperience", { required: "Select experience level" })}
-              className="w-full border p-2 rounded"
-            >
-              <option value="">Select Years of Experience</option>
-              <option value="0-1 Years">0-1 Years</option>
-              <option value="2-3 Years">2-3 Years</option>
-              <option value="4-5 Years">4-5 Years</option>
-              <option value="6-10 Years">6-10 Years</option>
-              <option value="10+ Years">10+ Years</option>
-            </select>
-            {errors.yearsExperience && <p className="text-red-500">{errors.yearsExperience.message}</p>}
+            <div>
+              <label htmlFor="yearsExperience" className="block text-md font-bold mb-1 text-gray-700">Years of Experience</label>
+              <select
+                {...register("yearsExperience", { required: "Select experience level" })}
+                className="w-full border p-2 rounded"
+              >
+                <option value="">Select Years of Experience</option>
+                <option value="0-1 Years">0-1 Years</option>
+                <option value="2-3 Years">2-3 Years</option>
+                <option value="4-5 Years">4-5 Years</option>
+                <option value="6-10 Years">6-10 Years</option>
+                <option value="10+ Years">10+ Years</option>
+              </select>
+              {errors.yearsExperience && <p className="text-red-500">{errors.yearsExperience.message}</p>}
+            </div>
 
             {/* PrimeReact MultiSelect */}
-            <Controller
-              name="specialty"
-              control={control}
-              rules={{ required: "Select at least one specialty" }}
-              render={({ field }) => (
-                <MultiSelect
-                  {...field}
-                  options={specialtyOptions}
-                  placeholder="Select Specialties"
-                  display="chip"
-                  className="w-full"
-                />
-              )}
-            />
-            {errors.specialty && <p className="text-red-500">{errors.specialty.message}</p>}
+            <div>
+              <label htmlFor="specialty" className="block text-md font-bold mb-1 text-gray-700">Specialty/Specialties</label>
+              <Controller
+                name="specialty"
+                control={control}
+                rules={{ required: "Select at least one specialty" }}
+                render={({ field }) => (
+                  <MultiSelect
+                    {...field}
+                    options={specialtyOptions}
+                    placeholder="Select Specialties"
+                    display="chip"
+                    className="w-full"
+                  />
+                )}
+              />
+              {errors.specialty && <p className="text-red-500">{errors.specialty.message}</p>}
+            </div>
+
+
+
 
             <button
               type="submit"
