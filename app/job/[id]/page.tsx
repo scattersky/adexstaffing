@@ -80,10 +80,22 @@ export default function SingleJobPage() {
       setSavedJobIds((prev) => [...prev, String(job.job_id)]);
     } catch (err) {
       console.error(err);
+      toastJobSavedError();
     }
   };
 
   const toastJobSaved = () => toast.info('Job Saved!', {
+    position: "bottom-right",
+    autoClose: 3000,
+    hideProgressBar: false,
+    closeOnClick: false,
+    pauseOnHover: true,
+    draggable: true,
+    progress: undefined,
+    theme: "colored",
+    transition: Slide,
+  });
+  const toastJobSavedError = () => toast.error('Error Saving Job', {
     position: "bottom-right",
     autoClose: 3000,
     hideProgressBar: false,
@@ -111,8 +123,8 @@ export default function SingleJobPage() {
         <section className="mt-12 max-w-7xl mx-auto md:px-8 min-h-screen">
           <div className="flex justify-between items-start gap-4 flex-wrap md:flex-nowrap px-4 md:px-0">
             {/*DASHBOARD LEFT*/}
-            <div className="flex flex-col items-start justify-start gap-2 w-full md:w-[25%]" >
-              <div className="flex flex-col items-start justify-start gap-1 bg-white rounded-lg p-4 shadow-lg w-full">
+            <div className="flex flex-col items-start justify-start gap-2 w-full md:w-[25%] h-screen" >
+              <div className="flex flex-col items-start justify-start gap-1 bg-white rounded-lg p-4 shadow-lg w-full sticky top-4">
                 <h3 className="text-gray-700 text-md font-bold mb-0">
                   Additional Details
                 </h3>
@@ -134,6 +146,12 @@ export default function SingleJobPage() {
                     <p className=' text-xs'><span className='font-bold  text-xs'>Weekly Pay: </span>${job.job_weekly_pay}</p>
                   </div>
                   <div className='flex items-center justify-start text-xs text-gray-600'>
+                    <p className=' text-xs'><span className='font-bold  text-xs'>VMS Name: </span>{job.job_vms_name}</p>
+                  </div>
+                  <div className='flex items-center justify-start text-xs text-gray-600'>
+                    <p className=' text-xs'><span className='font-bold  text-xs'>VMS ID: </span>{job.job_vms_id}</p>
+                  </div>
+                  <div className='flex items-center justify-start text-xs text-gray-600'>
                     <p className=' text-xs'><span className='font-bold  text-xs'>Job ID: </span>{job.job_id}</p>
                   </div>
                 </div>
@@ -150,16 +168,16 @@ export default function SingleJobPage() {
                   {job.job_title}
                 </h3>
                 <hr className='bg-black w-full h-0.5 mb-3 opacity-20'/>
-                <p className="text-gray-600 text-sm mb-4">
+                <div className="text-gray-600 text-sm mb-4">
                   {renderHTML(job.job_description)}
-                </p>
+                </div>
               </div>
             </div>
 
             {/*DASHBOARD RIGHT*/}
-            <div className="flex flex-col items-start justify-start gap-4 w-full md:w-[15%]" >
-              <div className="flex flex-col items-start justify-start gap-2  w-full pt-1">
-                <Link href={'https://adextravelnursing.com/'} className='flex items-center justify-center w-full gap-1 text-center px-4 py-2 border border-red-700 hover:border-red-600  bg-red-700 rounded-md hover:bg-red-600 duration-700 transition cursor-pointer text-[13px]'>
+            <div className="flex flex-col items-start justify-start gap-4 w-full md:w-[15%] h-screen" >
+              <div className="flex flex-col items-start justify-start gap-2  w-full pt-1  sticky top-4">
+                <Link href={'https://adextravelnursing.com/'} className='flex items-center justify-center w-full gap-1 text-center px-4 py-2 rounded-md border border-red-700 hover:border-red-600 hover:bg-linear-to-br hover:from-red-600 hover:to-red-900 bg-linear-to-br from-red-700 to-red-800 duration-700 transition cursor-pointer text-[13px]'>
                   <AiOutlineSend color="white" size={16}  />
                   <span className="flex items-center text-white text-xs">Apply Now</span>
                 </Link>
@@ -171,7 +189,7 @@ export default function SingleJobPage() {
                   className={`flex items-center justify-center gap-1 w-full stext-center px-4 py-2 border rounded-md transition cursor-pointer text-[13px] duration-700 text-white ${
                     isSaved
                       ? "bg-gray-500 cursor-not-allowed"
-                      : "border border-sky-800 hover:border-sky-700 hover:bg-sky-700 bg-sky-800"
+                      : "border border-sky-800 hover:border-sky-700  hover:bg-linear-to-br hover:from-sky-600 hover:to-cyan-900 bg-linear-to-br from-sky-700 to-cyan-900"
                   }`}
                 >
                   <RiFolderAddLine color="white" size={16} />

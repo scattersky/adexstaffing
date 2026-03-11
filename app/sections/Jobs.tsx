@@ -96,7 +96,7 @@ export default function Jobs() {
   }
   return (
     <div className="bg-gray-100 pt-2 pb-12">
-      <section className="mt-12 max-w-5xl mx-auto px-4">
+      <section className="mt-12 max-w-7xl mx-auto px-4">
         <div>
           <h2 className="text-gray-800 text-3xl font-semibold">
             Explore  Jobs

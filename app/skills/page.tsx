@@ -50,7 +50,7 @@ export default function CheckLists() {
     <div>
       <InnerPageTitle title='Skills Checklists' subHeading=''/>
       <div className="bg-gray-100 pt-2 pb-12">
-        <section className="mt-12 max-w-5xl mx-auto md:px-8">
+        <section className="mt-12 max-w-7xl mx-auto md:px-8">
           <div>
             <h2 className="text-gray-800 text-3xl font-semibold">
               Skills Checklists For Healthcare Professionals
