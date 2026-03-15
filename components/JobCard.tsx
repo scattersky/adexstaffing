@@ -12,6 +12,7 @@ import renderHTML from 'react-render-html';
 import {useRouter} from "next/navigation";
 import {FaCalendarAlt, FaHospitalAlt, FaRegCalendarAlt} from "react-icons/fa";
 import {FaMoneyCheckDollar} from "react-icons/fa6";
+import {MagicCard} from "@/components/magicui/magic-card";
 
 
 export function JobCard({
@@ -86,8 +87,14 @@ export function JobCard({
   };
 
   return (
-      <li key={job.job_id} className="p-5 bg-white rounded-md shadow-sm">
-        <div>
+      <li key={job.job_id} >
+        <MagicCard
+          gradientOpacity={0}
+          gradientTo="#c90000"
+          gradientFrom="#ff0000"
+          className="border-[2px] rounded-lg shadow-lg border-transparent"
+        >
+        <div className="p-5 bg-white rounded-md shadow-sm">
           <div className="justify-between sm:flex">
             <div className="flex-1">
               <p className='text-red-800 uppercase font-bold  tracking-widest text-[11px]'>{job.job_degree}</p>
@@ -98,6 +105,9 @@ export function JobCard({
               </Link>
               <div className='h-37.5 relative overflow-hidden w-full'>
                 <div className="text-gray-500 mt-2 pr-2 text-xs">
+
+
+
                   {/*{trimtext( job.job_description,350)}*/}
                   {renderHTML(job.job_description)}
                 </div>
@@ -124,14 +134,14 @@ export function JobCard({
                   ${job.job_weekly_pay}/wk
                  </span>
               </div>
-              <div className='flex items-start justify-start gap-2'>
-                <div className='min-w-4'>
-                  <FaHospitalAlt size={16} color="gray"/>
-                </div>
-                <span className="flex items-center text-gray-500 wrap-break-word">
-                   {job.job_facility}
-                 </span>
-              </div>
+              {/*<div className='flex items-start justify-start gap-2'>*/}
+              {/*  <div className='min-w-4'>*/}
+              {/*    <FaHospitalAlt size={16} color="gray"/>*/}
+              {/*  </div>*/}
+              {/*  <span className="flex items-center text-gray-500 wrap-break-word">*/}
+              {/*     {job.job_facility}*/}
+              {/*   </span>*/}
+              {/*</div>*/}
             </div>
           </div>
           <div className="mt-4 items-center space-y-4 text-sm sm:flex sm:space-x-4 sm:space-y-0">
@@ -146,11 +156,11 @@ export function JobCard({
                                             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
                                                 <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
                                             </svg>
-              {job.job_city}
+              {job.job_city}, {job.job_state}
                                         </span>
             <div className='flex items-center justify-end gap-2 ml-auto'>
-              <Link href={`/job/${job.job_id}`} className='flex items-center justify-center gap-1 text-center px-4 py-2 border rounded-md transition cursor-pointer text-[13px] duration-700 text-white border-cyan-800 hover:border-cyan-600 hover:bg-cyan-600 bg-cyan-800'>
-                <ImInfo  color="white" size={15}/>
+              <Link href={`/job/${job.job_id}`} className='flex items-center justify-center gap-1 text-center px-4 py-2 rounded-md transition cursor-pointer text-[13px] duration-700 text-white hover:bg-linear-to-br hover:from-cyan-500 hover:to-cyan-800 bg-linear-to-br from-cyan-600 to-cyan-800'>
+                <ImInfo  color="white" size={16}/>
                 <span className="flex items-center text-white text-xs leading-1">View Details</span>
               </Link>
 
@@ -162,20 +172,20 @@ export function JobCard({
                   className={`flex items-center justify-center gap-1 text-center px-4 py-2 border rounded-md transition cursor-pointer text-[13px] duration-700 text-white ${
                     isSaved
                       ? "bg-gray-500 cursor-not-allowed"
-                      : " border-sky-800 hover:border-sky-700  hover:bg-linear-to-br hover:from-sky-600 hover:to-cyan-900 bg-linear-to-br from-sky-700 to-cyan-900"
+                      : "hover:bg-linear-to-br hover:from-sky-600 hover:to-cyan-900 bg-linear-to-br from-sky-700 to-cyan-900"
                   }`}
                 >
                   <RiFolderAddLine color="white" size={16} />
                   <span className="flex items-center text-white text-xs leading-1">{isSaved ? "Job Saved" : "Save to My Jobs"}</span>
                 </button>
               ) : (
-                <button onClick={handleGoToLogin} className='flex items-center justify-center gap-1 text-center px-4 py-2 border bg-gray-500 cursor-pointer duration-700 text-[13px] rounded-md transition '>
+                <button onClick={handleGoToLogin} className='flex items-center justify-center gap-1 text-center px-4 py-2 bg-gray-500 cursor-pointer duration-700 text-[13px] rounded-md transition '>
                   <RiLock2Fill color="white" size={16}  />
                   <span className="flex items-center text-white text-xs">Login To Save Job</span>
                 </button>
               )}
 
-              <Link href={'https://adextravelnursing.com/'} className='flex items-center justify-center gap-1 text-center px-4 py-2 rounded-md  border border-red-700 hover:border-red-600 hover:bg-linear-to-br hover:from-red-600 hover:to-red-900 bg-linear-to-br from-red-700 to-red-800 transition cursor-pointer text-[13px]'>
+              <Link href={'https://adextravelnursing.com/'} className='flex items-center justify-center gap-1 text-center px-4 py-2 rounded-md  hover:bg-linear-to-br hover:from-red-600 hover:to-red-900 bg-linear-to-br from-red-700 to-red-800 transition cursor-pointer text-[13px]'>
                 <AiOutlineSend color="white" size={16}  />
                 <span className="flex items-center text-white text-xs">Apply Now</span>
               </Link>
@@ -183,7 +193,7 @@ export function JobCard({
 
           </div>
         </div>
-
+        </MagicCard>
       </li>
 
   );

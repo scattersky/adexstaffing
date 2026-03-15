@@ -146,7 +146,7 @@ export default function SingleJobPage() {
                     <p className=' text-xs'><span className='font-bold  text-xs'>Weekly Pay: </span>${job.job_weekly_pay}</p>
                   </div>
                   <div className='flex items-center justify-start text-xs text-gray-600'>
-                    <p className=' text-xs'><span className='font-bold  text-xs'>VMS Name: </span>{job.job_vms_name}</p>
+                    <p className=' text-xs'><span className='font-bold  text-xs'>Duration: </span>{job.job_priority}</p>
                   </div>
                   <div className='flex items-center justify-start text-xs text-gray-600'>
                     <p className=' text-xs'><span className='font-bold  text-xs'>VMS ID: </span>{job.job_vms_id}</p>

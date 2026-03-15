@@ -150,7 +150,7 @@ export default function Jobs() {
           {/* Apply Button */}
           <button
             onClick={applyFilters}
-            className="bg-red-700 text-white px-4 py-2 rounded hover:bg-red-600 transition cursor-pointer text-[13px]"
+            className="text-white px-4 py-2 rounded-md font-bold transition cursor-pointer text-[13px] border border-red-700 hover:border-red-600 hover:bg-linear-to-br hover:from-red-600 hover:to-red-900 bg-linear-to-br from-red-700 to-red-800"
           >
             Apply Filters
           </button>
