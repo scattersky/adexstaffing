@@ -20,6 +20,7 @@ import MyCalendar from "@/components/MyCalendar";
 import {RiLogoutBoxLine} from "react-icons/ri";
 import {signOut} from "firebase/auth";
 import {auth} from "@/lib/firebase";
+import RecruiterCandidatesList from "@/components/RecruiterCandidatesList";
 
 interface UserProfile {
   id: number;
@@ -31,20 +32,6 @@ interface UserProfile {
   specialty: string;
   years_experience: string;
 }
-interface AddCandidateForm {
-  first_name: string;
-  last_name: string;
-  email: string;
-  phone: string;
-  preferred_location: string[];
-  preferred_shift: string[];
-  degree: string;
-  specialty: string[];
-  misc_notes: string;
-  recruiter_name: string;
-  recruiter_email: string;
-  firebase_uid: string | undefined;
-}
 
 export default function RecruiterDashboard() {
   const { user, role,  loading: authLoading } = useAuth();
@@ -53,15 +40,14 @@ export default function RecruiterDashboard() {
   const [loading, setLoading] = useState(true);
   const[savedJobs, setSavedJobs] = useState<any[]>([]);
   const [candidates, setCandidates] = useState<any[]>([]);
-  const [errors, setErrors] = useState<any[]>([]);
+
   const [notificationsVisible, setNotificationsVisible] = useState(true);
   const [settingsVisible, setSettingsVisible] = useState(false);
   const [candidatesVisible, setCandidatesVisible] = useState(false);
   const [addCandidateVisible, setAddCandidateVisible] = useState(false);
   const [savedJobsVisible, setSavedJobsVisible] = useState(false);
   const [calendarVisible, setCalendarVisible] = useState(false);
-  const [addCandidateFormLoading, setAddCandidateFormLoading] = useState(false);
-  const [specialtyOptions, setSpecialtyOptions] = useState<any[]>([]);
+
 
 
   useEffect(() => {
@@ -104,155 +90,8 @@ export default function RecruiterDashboard() {
     fetchCandidates();
   }, [user]);
 
-  const fetchSpecialties = async () => {
-    try {
-      const res = await axios.get(
-        "https://adextravelnursing.com/api_get_specialty_options.php"
-      );
-
-      const options = res.data.map((specialty: string) => ({
-        label: specialty,
-        value: specialty
-      }));
-
-      setSpecialtyOptions(options);
-    } catch (err) {
-      console.error("Error fetching specialties:", err);
-    }
-  };
-  useEffect(() => {
-    fetchSpecialties();
-  }, []);
 
 
-  const shiftOptions = [
-    { label: "Day", value: "Day" },
-    { label: "Night", value: "Night" },
-    { label: "Weekends", value: "Weekends" },
-  ];
-  const stateOptions = [
-    { label: "Alabama", value: "AL" },
-    { label: "Alaska", value: "AK" },
-    { label: "Arizona", value: "AZ" },
-    { label: "Arkansas", value: "AR" },
-    { label: "California", value: "CA" },
-    { label: "Colorado", value: "CO" },
-    { label: "Connecticut", value: "CT" },
-    { label: "Delaware", value: "DE" },
-    { label: "Florida", value: "FL" },
-    { label: "Georgia", value: "GA" },
-    { label: "Hawaii", value: "HI" },
-    { label: "Idaho", value: "ID" },
-    { label: "Illinois", value: "IL" },
-    { label: "Indiana", value: "IN" },
-    { label: "Iowa", value: "IA" },
-    { label: "Kansas", value: "KS" },
-    { label: "Kentucky", value: "KY" },
-    { label: "Louisiana", value: "LA" },
-    { label: "Maine", value: "ME" },
-    { label: "Maryland", value: "MD" },
-    { label: "Massachusetts", value: "MA" },
-    { label: "Michigan", value: "MI" },
-    { label: "Minnesota", value: "MN" },
-    { label: "Mississippi", value: "MS" },
-    { label: "Missouri", value: "MO" },
-    { label: "Montana", value: "MT" },
-    { label: "Nebraska", value: "NE" },
-    { label: "Nevada", value: "NV" },
-    { label: "New Hampshire", value: "NH" },
-    { label: "New Jersey", value: "NJ" },
-    { label: "New Mexico", value: "NM" },
-    { label: "New York", value: "NY" },
-    { label: "North Carolina", value: "NC" },
-    { label: "North Dakota", value: "ND" },
-    { label: "Ohio", value: "OH" },
-    { label: "Oklahoma", value: "OK" },
-    { label: "Oregon", value: "OR" },
-    { label: "Pennsylvania", value: "PA" },
-    { label: "Rhode Island", value: "RI" },
-    { label: "South Carolina", value: "SC" },
-    { label: "South Dakota", value: "SD" },
-    { label: "Tennessee", value: "TN" },
-    { label: "Texas", value: "TX" },
-    { label: "Utah", value: "UT" },
-    { label: "Vermont", value: "VT" },
-    { label: "Virginia", value: "VA" },
-    { label: "Washington", value: "WA" },
-    { label: "West Virginia", value: "WV" },
-    { label: "Wisconsin", value: "WI" },
-    { label: "Wyoming", value: "WY" }
-  ];
-  // Add New Candidate
-  const [addCandidateForm, setAddCandidateForm] = useState<AddCandidateForm>({
-    first_name: '',
-    last_name: '',
-    email: '',
-    phone: '',
-    preferred_location: [],
-    preferred_shift: [],
-    degree: '',
-    specialty: [],
-    misc_notes: '',
-    recruiter_name: '',
-    recruiter_email: '',
-    firebase_uid: user?.uid,
-  });
-  const handleAddCandidateFormChange = (e: any) => {
-    setAddCandidateForm({
-      ...addCandidateForm,
-      [e.target.name]: e.target.value,
-    });
-  };
-  const handleMultiSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const values = Array.from(e.target.selectedOptions, option => option.value);
-
-    setAddCandidateForm(prev => ({
-      ...prev,
-      [e.target.name]: values
-    }));
-  };
-  const handleUpdateAddCandidate = async (e: any) => {
-    e.preventDefault();
-    setAddCandidateFormLoading(true);
-    try {
-      await axios.post(
-        'https://adextravelnursing.com/api_add_new_candidate.php',
-        addCandidateForm
-      );
-    } catch (err:any) {
-      setErrors(err);
-      addCandidateFormErrorToast();
-      setAddCandidateFormLoading(false);
-      return;
-    }
-
-    setAddCandidateFormLoading(false);
-    addCandidateFormUpdatedToast();
-    fetchCandidates();
-
-  };
-  const addCandidateFormUpdatedToast = () => toast.success('Candidate Added!', {
-    position: "bottom-right",
-    autoClose: 3000,
-    hideProgressBar: false,
-    closeOnClick: false,
-    pauseOnHover: true,
-    draggable: true,
-    progress: undefined,
-    theme: "colored",
-    transition: Slide,
-  });
-  const addCandidateFormErrorToast = () => toast.error('Error Adding Candidate:'+errors, {
-    position: "bottom-right",
-    autoClose: 3000,
-    hideProgressBar: false,
-    closeOnClick: false,
-    pauseOnHover: true,
-    draggable: true,
-    progress: undefined,
-    theme: "colored",
-    transition: Slide,
-  });
 
   const fetchSavedJobs = async () => {
     if (!user) return;
@@ -325,14 +164,7 @@ export default function RecruiterDashboard() {
     setSavedJobsVisible(false);
     setCalendarVisible(false);
   }
-  const handleAddCandidateVisibility = () => {
-    setNotificationsVisible(false)
-    setCandidatesVisible(false)
-    setSettingsVisible(false);
-    setAddCandidateVisible(true);
-    setSavedJobsVisible(false);
-    setCalendarVisible(false);
-  }
+
   const handleSavedJobsVisibility = () => {
     setNotificationsVisible(false)
     setCandidatesVisible(false)
@@ -361,64 +193,85 @@ export default function RecruiterDashboard() {
   return (
     <div>
       {/*<InnerPageTitle title='Dashboard' subHeading='Recruiter' />*/}
-      <div className=' bg-linear-to-br from-red-700 to-red-800 py-5 px-8'>
-        <h1 className='text-white text-2xl font-medium'>Recruiter Dashboard</h1>
-      </div>
-      <div className="bg-gray-100 pt-2 pb-12">
-        <section className="mt-8 max-w-full mx-auto md:px-8 min-h-screen">
-          <div className="flex justify-between items-start gap-4 flex-wrap md:flex-nowrap px-4 md:px-0">
+
+      <div className="bg-gray-100 h-full">
+        <section className="max-w-full mx-auto h-full">
+          <div className="flex justify-start items-start flex-wrap md:flex-nowrap relative">
 
             {/*DASHBOARD LEFT*/}
-            <div className="flex flex-col items-start justify-between gap-2 bg-white rounded-lg p-6 shadow-lg w-full md:w-[20%] min-w-60 max-w-70 h-screen max-h-[70vh]" >
+            <div className="flex flex-col items-start justify-between gap-2 bg-[#222] p-6 w-full md:w-[20%] min-w-70 max-w-70 h-full min-h-screen absolute" >
               <div className=" w-full">
-                <h3 className="text-gray-800 text-xl font-normal mb-0">
-                  Welcome,
-                </h3>
-                <h3 className="text-gray-800 text-3xl font-black mb-2">
-                  {userData?.first_name} {userData?.last_name}
-                </h3>
+                <div className=" w-full px-2 mt-6">
+                  <h3 className="text-white text-lg font-normal mb-0">
+                    Welcome,
+                  </h3>
+                  <h3 className="text-white text-2xl font-black mb-1">
+                    {userData?.first_name} {userData?.last_name}
+                  </h3>
+                  <div className="flex justify-center items-center px-2 py-1 w-30 rounded-md bg-red-800 ml-[-2px] mb-6">
+                    <span className="text-white text-[11px] leading-3 mt-1  font-medium uppercase tracking-widest">RECRUITER</span>
+                  </div>
+                </div>
 
-                <hr className='bg-black w-full h-0.5 mb-1 opacity-20'/>
+
+                <hr className='bg-white w-full h-0.5 mb-1 opacity-10'/>
                 <div className="flex flex-col items-start justify-start gap-2 pt-5">
                   <button
                     onClick={handleNotificationsVisibility}
-                    className="flex items-center justify-start gap-1 w-full stext-center px-4 py-2 rounded-md transition cursor-pointer text-[12px] font-medium duration-700 text-white border border-sky-800 hover:border-sky-700  hover:bg-linear-to-br hover:from-sky-600 hover:to-cyan-900 bg-linear-to-br from-sky-700 to-cyan-900">
+                    className={`flex items-center justify-start gap-1 w-full px-0 py-2 rounded-md transition cursor-pointer text-[12px] font-medium duration-700 text-white pl-2  hover:bg-linear-to-br hover:from-sky-800 hover:to-sky-950 ${
+                      notificationsVisible
+                        ? "bg-linear-to-br from-sky-800 to-sky-950"
+                        : ""
+                    }`}
+                  >
                     <MdNotificationsActive  size={16} className=""/>
                     <span>Notifications</span>
                   </button>
                   <button
                     onClick={handleCandidatesVisibility}
-                    className="flex items-center justify-start gap-1 w-full stext-center px-4 py-2 rounded-md transition cursor-pointer text-[12px] font-medium duration-700 text-white border border-sky-800 hover:border-sky-700  hover:bg-linear-to-br hover:from-sky-600 hover:to-cyan-900 bg-linear-to-br from-sky-700 to-cyan-900">
+                    className={`flex items-center justify-start gap-1 w-full px-0 py-2 rounded-md transition cursor-pointer text-[12px] font-medium duration-700 text-white pl-2  hover:bg-linear-to-br hover:from-sky-800 hover:to-sky-950 ${
+                      candidatesVisible
+                        ? "bg-linear-to-br from-sky-800 to-sky-950"
+                        : ""
+                    }`}
+                    >
                     <MdGroups  size={16} className=""/>
                     <span>My Candidates</span>
                   </button>
-                  <button
-                    onClick={handleAddCandidateVisibility}
-                    className="flex items-center justify-start gap-1 w-full stext-center px-4 py-2 rounded-md transition cursor-pointer text-[12px] font-medium duration-700 text-white border border-sky-800 hover:border-sky-700  hover:bg-linear-to-br hover:from-sky-600 hover:to-cyan-900 bg-linear-to-br from-sky-700 to-cyan-900">
-                    <IoPersonAdd  size={16} className=""/>
-                    <span>Add New Candidate</span>
-                  </button>
+
                   <button
                     onClick={handleSavedJobsVisibility}
-                    className="flex items-center justify-start gap-1 w-full stext-center px-4 py-2 rounded-md transition cursor-pointer text-[12px] font-medium duration-700 text-white border border-sky-800 hover:border-sky-700  hover:bg-linear-to-br hover:from-sky-600 hover:to-cyan-900 bg-linear-to-br from-sky-700 to-cyan-900">
+                    className={`flex items-center justify-start gap-1 w-full px-0 py-2 rounded-md transition cursor-pointer text-[12px] font-medium duration-700 text-white pl-2  hover:bg-linear-to-br hover:from-sky-800 hover:to-sky-950 ${
+                     savedJobsVisible
+                        ? "bg-linear-to-br from-sky-800 to-sky-950"
+                        : ""
+                    }`}>
                     <IoFileTrayFullOutline size={16} className=""/>
                     <span>Saved Jobs</span>
                   </button>
                   <button
                     onClick={handleCalendarVisibility}
-                    className="flex items-center justify-start gap-1 w-full stext-center px-4 py-2 rounded-md transition cursor-pointer text-[12px] font-medium duration-700 text-white border border-sky-800 hover:border-sky-700  hover:bg-linear-to-br hover:from-sky-600 hover:to-cyan-900 bg-linear-to-br from-sky-700 to-cyan-900">
+                    className={`flex items-center justify-start gap-1 w-full px-0 py-2 rounded-md transition cursor-pointer text-[12px] font-medium duration-700 text-white pl-2  hover:bg-linear-to-br hover:from-sky-800 hover:to-sky-950 ${
+                      calendarVisible
+                        ? "bg-linear-to-br from-sky-800 to-sky-950"
+                        : ""
+                    }`}>
                     <FaRegCalendarDays  size={16} className=""/>
-                    <span>My Calendar</span>
+                    <span>Calendar</span>
                   </button>
                   <button
                     onClick={handleSettingsVisibility}
-                    className="flex items-center justify-start gap-1 w-full stext-center px-4 py-2 rounded-md transition cursor-pointer text-[12px] font-medium duration-700 text-white border border-sky-800 hover:border-sky-700  hover:bg-linear-to-br hover:from-sky-600 hover:to-cyan-900 bg-linear-to-br from-sky-700 to-cyan-900">
+                    className={`flex items-center justify-start gap-1 w-full px-0 py-2 rounded-md transition cursor-pointer text-[12px] font-medium duration-700 text-white pl-2  hover:bg-linear-to-br hover:from-sky-800 hover:to-sky-950 ${
+                      settingsVisible
+                        ? "bg-linear-to-br from-sky-800 to-sky-950"
+                        : ""
+                    }`}>
                     <PiGear  size={16} className=""/>
                     <span>Settings</span>
                   </button>
                   <button
                     onClick={handleLogout}
-                    className="flex items-center justify-start gap-1 w-full stext-center px-4 py-2 rounded-md transition cursor-pointer text-[12px] font-medium duration-700 text-white border border-red-700 hover:border-red-600 hover:bg-linear-to-br hover:from-red-600 hover:to-red-900 bg-linear-to-br from-red-700 to-red-800">
+                    className="flex items-center justify-start gap-1 w-full stext-center  pl-2 py-2 rounded-md transition cursor-pointer text-[12px] font-medium duration-700 text-white  hover:border-red-600 hover:bg-linear-to-br hover:from-red-600 hover:to-red-900">
                     <RiLogoutBoxLine  size={16} className=""/>
                     <span>Logout</span>
                   </button>
@@ -434,277 +287,44 @@ export default function RecruiterDashboard() {
             </div>
 
             {/*DASHBOARD RIGHT*/}
-            <div className="flex flex-col items-start justify-start gap-4 w-full md:w-[80%]" >
+
+            <div className="flex flex-col items-start justify-start gap-4 mx-auto  w-full h-full min-h-screen pl-70" >
+              <div className=' bg-sky-900 py-4 px-8 w-full'>
+                <h1 className='text-white text-sm tracking-wide font-normal uppercase mt-1'>Dashboard</h1>
+                <h3 className='text-white text-2xl font-bold'>
+                  {notificationsVisible ? "Notifications" : ""}
+                  {candidatesVisible ? "My Candidates" : ""}
+
+                  {savedJobsVisible ? "My Saved Jobs" : ""}
+                  {calendarVisible ? "Calendar" : ""}
+                  {settingsVisible ? "Settings" : ""}
+                </h3>
+              </div>
+              <div className='p-8 w-full'>
+
 
               {/*PANEL: NOTIFICATIONS */}
               {notificationsVisible && (
                 <div className="flex flex-col items-start justify-start gap-2 bg-white rounded-lg p-4 shadow-lg w-full">
-                  <h3 className="text-gray-800 text-lg font-bold  mb-2">
-                    Notifications
-                  </h3>
+
                 </div>
               )}
 
               {/*PANEL: CANDIDATES*/}
               {candidatesVisible && (
                 <div className="flex flex-col items-start justify-start gap-2 bg-white rounded-lg p-4 shadow-lg w-full">
-                  <h3 className="text-gray-800 text-md font-black mb-2">
-                    My Candidates
-                  </h3>
-                  <div className="min-w-full">
-                    <div
-                      className="overflow-x-auto [&::-webkit-scrollbar]:h-2 [&::-webkit-scrollbar-thumb]:rounded-none [&::-webkit-scrollbar-track]:bg-scrollbar-track [&::-webkit-scrollbar-thumb]:bg-scrollbar-thumb">
-                      <table className="min-w-full divide-y divide-table-line">
-                        <thead>
-                        <tr>
-                          <th scope="col"
-                              className=" pr-2 py-3 text-start text-[10px] md:text-xs font-bold text-muted-foreground-1 uppercase">Name
-                          </th>
-                          <th scope="col"
-                              className=" pr-2 py-3 text-start text-[10px] md:text-xs font-bold text-muted-foreground-1 uppercase">Email
-                          </th>
-                          <th scope="col"
-                              className=" pr-2 py-3 text-start text-[10px] md:text-xs font-bold text-muted-foreground-1 uppercase">Phone
-                          </th>
-                          <th scope="col"
-                              className="py-3 pr-2 text-start text-[10px] md:text-xs font-bold text-muted-foreground-1 uppercase">Degree
-                          </th>
-                          <th scope="col"
-                              className="py-3 pr-2 text-start text-[10px] md:text-xs font-bold text-muted-foreground-1 uppercase">Specialty
-                          </th>
-                          <th scope="col"
-                              className="hidden md:block py-3 pr-2 text-start text-[10px] md:text-xs font-bold text-muted-foreground-1 uppercase">Preferred Location
-                          </th>
-                          <th scope="col"
-                              className="py-3 pr-2 text-start text-[10px] md:text-xs font-bold text-muted-foreground-1 uppercase">Preferred Shift
-                          </th>
-                          <th scope="col"
-                              className="py-3 pr-2 text-start text-[10px] md:text-xs font-bold text-muted-foreground-1 uppercase">Date Added
-                          </th>
-                          <th scope="col"
-                              className="py-3 text-start text-[10px] md:text-xs font-bold text-muted-foreground-1 uppercase">Actions
-                          </th>
-                        </tr>
-                        </thead>
-                        <tbody className="divide-y divide-table-line">
-                        {candidates.map((candidate: any) => (
-                          <tr key={candidate.id}>
-                            <td className="py-4 pr-2 whitespace-wrap  text-[10px] md:text-xs text-foreground">{candidate.first_name} {candidate.last_name}</td>
-                            <td className="py-4 pr-2 whitespace-wrap  text-[10px] md:text-xs text-foreground">{candidate.email}</td>
-                            <td className="py-4 pr-2 whitespace-wrap  text-[10px] md:text-xs text-foreground">{candidate.phone}</td>
-                            <td className="py-4 pr-2 whitespace-wrap  text-[10px] md:text-xs text-foreground">{candidate.degree}</td>
-                            <td className="py-4 pr-2 whitespace-wrap  text-[10px] md:text-xs text-foreground">{candidate.specialty}</td>
-                            <td className="py-4 pr-2 whitespace-wrap  text-[10px] md:text-xs text-foreground">{candidate.preferred_location}</td>
-                            <td className="py-4 pr-2 whitespace-wrap  text-[10px] md:text-xs text-foreground">{candidate.preferred_shift}</td>
-                            <td className="py-4 pr-2 whitespace-wrap  text-[10px] md:text-xs text-foreground">{moment(candidate.created_at).format('MM/DD/YY')}</td>
-                            <td className="py-4  whitespace-wrap md:whitespace-nowrap  text-center  text-[10px] md:text-xs font-medium">
-                              <div className="flex items-center justify-center gap-2">
-                                <Link href="" className='text-xs font-semibold text-cyan-600 cursor-pointer  focus:outline-hidden  disabled:opacity-50 disabled:pointer-events-none'>
-                                  <FaEye />
-                                </Link>
-                                <button
-                                  type="button"
+                  <RecruiterCandidatesList />
 
-                                  className="text-xs font-semibold text-red-700 cursor-pointer  focus:outline-hidden  disabled:opacity-50 disabled:pointer-events-none"><FaRegTrashAlt />
 
-                                </button>
-                              </div>
-
-                            </td>
-                          </tr>
-                        ))}
-
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
                 </div>
               )}
 
-              {/*PANEL: ADD CANDIDATE */}
-              {addCandidateVisible && (
-                <div className="flex flex-col items-start justify-start gap-2 bg-white rounded-lg p-4 shadow-lg w-full">
-                  <h3 className="text-gray-800 text-md font-black mb-2">
-                    Add Candidate
-                  </h3>
-                  <form
-                    className='mt-4 flex flex-col gap-5 w-full'
-                    onSubmit={handleUpdateAddCandidate}
-                  >
-                    <div className='flex flex-row gap-2 w-full'>
-                      <div className='flex flex-col w-full'>
-                        <label
-                          className='text-gray-700 p-1 block'
-                          htmlFor='username'
-                        >
-                          First Name
-                        </label>
-                        <input
-                          type='text'
-                          name='first_name'
-                          value={addCandidateForm?.first_name}
-                          onChange={handleAddCandidateFormChange}
-                          className='w-full border p-2 rounded'
-                        />
-                      </div>
-                      <div className='flex flex-col w-full'>
-                        <label
-                          className='text-gray-700 p-1 block'
-                          htmlFor='username'
-                        >
-                          Last Name
-                        </label>
-                        <input
-                          type='text'
-                          name='last_name'
-                          value={addCandidateForm?.last_name}
-                          onChange={handleAddCandidateFormChange}
-                          className='w-full border p-2 rounded'
-                        />
-                      </div>
-                    </div>
 
-                    <div className='flex flex-row gap-2 w-full'>
-                      <div className='flex flex-col w-full'>
-                        <label
-                          className='text-gray-700 p-1 block'
-                          htmlFor='username'
-                        >
-                          Email
-                        </label>
-                        <input
-                          type='email'
-                          name='email'
-                          value={addCandidateForm?.email}
-                          onChange={handleAddCandidateFormChange}
-                          className='w-full border p-2 rounded'
-                        />
-                      </div>
-                      <div className='flex flex-col w-full'>
-                        <label
-                          className='text-gray-700 p-1 block'
-                          htmlFor='username'
-                        >
-                          Phone
-                        </label>
-                        <input
-                          type='tel'
-                          name='phone'
-                          value={addCandidateForm?.phone}
-                          onChange={handleAddCandidateFormChange}
-                          className='w-full border p-2 rounded'
-                        />
-                      </div>
-                    </div>
-
-                    <div className='flex flex-row gap-2 w-full'>
-                      <div className='flex flex-col w-1/2'>
-                        <label
-                          className='text-gray-700 p-1 block'
-                          htmlFor='username'
-                        >
-                          Degree/Modality
-                        </label>
-                        <select
-                          name='degree'
-                          value={addCandidateForm?.degree}
-                          onChange={handleAddCandidateFormChange}
-                          className='w-full border p-2 rounded bg-white'
-                        >
-                          <option value=''>Select Degree</option>
-                          <option value='LPN'>RN</option>
-                          <option value='ADN'>Allied</option>
-                        </select>
-                      </div>
-
-                    </div>
-
-
-                    <div className="flex flex-col w-full">
-                      <label className="text-gray-700 p-1 block">
-                        Specialty/Specialties
-                      </label>
-
-                      <MultiSelect
-                        value={addCandidateForm.specialty}
-                        options={specialtyOptions}
-                        onChange={(e) =>
-                          setAddCandidateForm({
-                            ...addCandidateForm,
-                            specialty: e.value
-                          })
-                        }
-                        placeholder="Select Specialties"
-                        className="w-full"
-                        display="chip"
-                        filter
-                        showClear
-                      />
-                    </div>
-
-                    <div className="flex flex-col w-full">
-                      <label className="text-gray-700 p-1 block">
-                        Preferred Shift(s)
-                      </label>
-
-                      <MultiSelect
-                        value={addCandidateForm.preferred_shift}
-                        options={shiftOptions}
-                        onChange={(e) =>
-                          setAddCandidateForm({
-                            ...addCandidateForm,
-                            preferred_shift: e.value
-                          })
-                        }
-                        placeholder="Select Shifts"
-                        className="w-full"
-                        display="chip"
-                      />
-                    </div>
-
-                    <div className="flex flex-col w-full">
-                      <label className="text-gray-700 p-1 block">
-                        Preferred Location(s)
-                      </label>
-
-                      <MultiSelect
-                        value={addCandidateForm.preferred_location}
-                        options={stateOptions}
-                        onChange={(e) =>
-                          setAddCandidateForm({
-                            ...addCandidateForm,
-                            preferred_location: e.value
-                          })
-                        }
-                        placeholder="Select States"
-                        className="w-full"
-                        display="chip"
-                        filter
-                        showClear
-                      />
-                    </div>
-
-
-                    <div className='flex justify-end gap-[20px]'>
-                      <button
-                        type='submit'
-                        disabled={addCandidateFormLoading}
-                        className='flex items-center justify-center gap-1 text-center px-4 py-2 border border-red-700 hover:border-red-600  bg-red-700 rounded-md hover:bg-red-600 duration-700 transition cursor-pointer text-[13px]'
-                      >
-                        <FaUserCheck color="white" size={16}  />
-                        <span className="flex items-center text-white text-xs">{addCandidateFormLoading ? 'Adding...' : 'Add Candidate'}</span>
-                      </button>
-                    </div>
-                  </form>
-                </div>
-              )}
 
               {/*PANEL: SAVED JOBS */}
               {savedJobsVisible && (
                 <div className="flex flex-col items-start justify-start gap-2 bg-white rounded-lg p-4 shadow-lg w-full">
-                  <h3 className="text-gray-800 text-md font-black mb-2">
-                    My Saved Jobs
-                  </h3>
+
                   <div className="min-w-full">
                     <div
                       className="overflow-x-auto [&::-webkit-scrollbar]:h-2 [&::-webkit-scrollbar-thumb]:rounded-none [&::-webkit-scrollbar-track]:bg-scrollbar-track [&::-webkit-scrollbar-thumb]:bg-scrollbar-thumb">
@@ -766,9 +386,7 @@ export default function RecruiterDashboard() {
               {/*PANEL: CALENDAR */}
               {calendarVisible && (
                 <div className="flex flex-col items-start justify-start gap-2 bg-white rounded-lg p-4 shadow-lg w-full">
-                  <h3 className="text-gray-800 text-md font-black mb-2">
-                    My Calendar
-                  </h3>
+
                   <MyCalendar />
                 </div>
               )}
@@ -776,11 +394,10 @@ export default function RecruiterDashboard() {
               {/*PANEL: SETTINGS */}
               {settingsVisible && (
                 <div className="flex flex-col items-start justify-start gap-2 bg-white rounded-lg p-4 shadow-lg w-full">
-                  <h3 className="text-gray-800 text-md font-black mb-2">
-                    Settings
-                  </h3>
+
                 </div>
               )}
+              </div>
 
             </div>
           </div>

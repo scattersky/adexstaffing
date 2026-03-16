@@ -28,8 +28,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (user) {
         try {
           const res = await axios.get(
-            `https://adextravelnursing.com/api_get_user.php?uid=${user.uid}`
+            "https://adextravelnursing.com/api_get_user.php",
+            {
+              params: { uid: user?.uid }
+            }
           );
+          console.log(res);
 
           setRole(res.data.role);
         } catch (err) {

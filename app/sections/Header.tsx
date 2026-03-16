@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import { getAuth, onAuthStateChanged, signOut, User } from "firebase/auth";
 import {app} from "@/lib/firebase";
+import ExpandableContactScreen from "@/components/ExpandableContactScreen";
 
 export default function Header() {
   const auth = getAuth(app);
@@ -24,7 +25,7 @@ export default function Header() {
     await signOut(auth);
   };
   return (
-    <div className="px-4 py-5 mx-auto sm:max-w-xl md:max-w-full lg:max-w-fulll md:px-24 lg:px-8">
+    <div className="px-4 py-5 mx-auto sm:max-w-xl md:max-w-full lg:max-w-fulll md:px-24 lg:px-8 shadow-md z-50 relative">
       <div className="relative flex items-center justify-between">
         <a
           href="/"
@@ -66,6 +67,11 @@ export default function Header() {
               </li>
             </>
           )}
+
+          <li>
+            <ExpandableContactScreen />
+          </li>
+
           {!loading && !user && (
             <>
               <li>

@@ -94,7 +94,7 @@ export default function MyCalendar() {
 
   return (
     <div className="bg-white p-4 rounded-xl shadow">
-      <h2 className="text-lg font-semibold mb-4">Event Calendar</h2>
+
 
       <FullCalendar
         plugins={[dayGridPlugin, interactionPlugin]}
