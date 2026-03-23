@@ -39,7 +39,6 @@ interface UserProfile {
   years_experience: string;
 }
 interface AddCandidateForm {
-  firebase_uid: string;
   first_name: string;
   last_name: string;
   email: string;
@@ -52,18 +51,18 @@ interface AddCandidateForm {
   recruiter_name: string;
   recruiter_email: string;
   role: string;
-  recruiter_firebase_uid: string | undefined;
+  firebase_uid: string | undefined;
 }
 
-export default function RecruiterCandidatesList() {
+export default function AdminCandidatesList() {
   const { user, role, loading: authLoading } = useAuth();
   const [userData, setUserData] = useState<UserProfile | null>(null);
   const [candidates, setCandidates] = useState<any[]>([]);
   const [selectedCandidate, setSelectedCandidate] = useState<any>(null);
   const [matchedJobs, setMatchedJobs] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [activeTabIndex, setActiveTabIndex] = useState(0);
   const [activeMatchesTabIndex, setActiveMatchesTabIndex] = useState(0);
-  const [activeTabIndex, setActiveTabIndex] = useState(0); // first tab active by default
   const [jobsLoading, setJobsLoading] = useState(false);
   const [candidatesLoading, setCandidatesLoading] = useState(false);
   const [addCandidateFormLoading, setAddCandidateFormLoading] = useState(false);
@@ -92,8 +91,8 @@ export default function RecruiterCandidatesList() {
     setCandidatesLoading(true);
     try {
       const res = await axios.get(
-        "https://adextravelnursing.com/api_get_candidates.php",
-        { params: { uid: user?.uid } }
+        "https://adextravelnursing.com/api_admin_get_candidates.php",
+        { params: { uid: user.uid } }
       );
 
       setCandidates(
@@ -111,7 +110,6 @@ export default function RecruiterCandidatesList() {
       console.error(err);
     }
   };
-
 
   const fetchMatchedJobs = async (candidate: any) => {
     setJobsLoading(true);
@@ -165,7 +163,7 @@ export default function RecruiterCandidatesList() {
 
   const getMatchLabel = (score: number) => {
     if (score >= 9) return (
-      <Badge value="Perfect Match!" severity="success" className='text-xs'></Badge>
+      <Badge value="Perfect Match!" severity="success"></Badge>
     );
     if (score >= 7) return  (
       <Badge value="Strong Match!" severity="secondary"></Badge>
@@ -203,11 +201,9 @@ export default function RecruiterCandidatesList() {
 
 
   const shiftOptions = [
-    { label: "Days", value: "Days" },
-    { label: "Nights", value: "Nights" },
+    { label: "Day", value: "Day" },
+    { label: "Night", value: "Night" },
     { label: "Weekends", value: "Weekends" },
-    { label: "Rotating", value: "Rotating" },
-    { label: "Flex", value: "Flex" },
   ];
   const stateOptions = [
     { label: "Alabama", value: "AL" },
@@ -263,7 +259,6 @@ export default function RecruiterCandidatesList() {
   ];
   // Add New Candidate
   const [addCandidateForm, setAddCandidateForm] = useState<AddCandidateForm>({
-    firebase_uid: '',
     first_name: '',
     last_name: '',
     email: '',
@@ -276,7 +271,7 @@ export default function RecruiterCandidatesList() {
     recruiter_name: '',
     recruiter_email: '',
     role: 'candidate',
-    recruiter_firebase_uid: user?.uid,
+    firebase_uid: user?.uid,
   });
   const handleAddCandidateFormChange = (e: any) => {
     setAddCandidateForm({
@@ -288,7 +283,7 @@ export default function RecruiterCandidatesList() {
     if (user?.uid) {
       setAddCandidateForm(prev => ({
         ...prev,
-        recruiter_firebase_uid: user.uid
+        firebase_uid: user.uid
       }));
     }
   }, [user]);
@@ -308,12 +303,10 @@ export default function RecruiterCandidatesList() {
       // Prepare the payload
       const payload = {
         ...addCandidateForm,
-        recruiter_firebase_uid: user?.uid, // ensure UID is always included
+        firebase_uid: user?.uid, // ensure UID is always included
         specialty: addCandidateForm.specialty, // array
         preferred_location: addCandidateForm.preferred_location, // array
-        preferred_shift: addCandidateForm.preferred_shift,
-        recruiter_name: userData?.first_name,
-        recruiter_email: userData?.email,
+        preferred_shift: addCandidateForm.preferred_shift, // array
       };
 
       const res = await axios.post(
@@ -341,7 +334,6 @@ export default function RecruiterCandidatesList() {
 
         // Reset the form
         setAddCandidateForm({
-          firebase_uid: '',
           first_name: '',
           last_name: '',
           email: '',
@@ -354,7 +346,7 @@ export default function RecruiterCandidatesList() {
           recruiter_name: '',
           recruiter_email: '',
           role: 'candidate',
-          recruiter_firebase_uid: user?.uid,
+          firebase_uid: user?.uid,
         });
 
         fetchCandidates(); // refresh candidate list
@@ -413,7 +405,6 @@ export default function RecruiterCandidatesList() {
         <TabPanels>
           {/* Candidates List */}
           <TabPanel>
-            <div className='border rounded-md border-gray-100 w-full p-4 min-h-40 bg-white shadow'>
             {candidatesLoading ? (
               <div className="flex justify-center items-center text-center h-64 w-full">
                 <div className="flex flex-col flex-nowrap justify-center items-center text-center h-full w-full">
@@ -453,7 +444,7 @@ export default function RecruiterCandidatesList() {
                 </TableBody>
               </Table>
             )}
-            </div>
+
           </TabPanel>
 
           {/* Candidate Details */}
@@ -461,15 +452,15 @@ export default function RecruiterCandidatesList() {
             {selectedCandidate ? (
               <div className='flex flex-col gap-8 pb-4'>
                 {/* Candidate Info */}
-                <div className=" rounded-lg p-0">
-                  <div className="flex justify-between items-start mb-4 gap-4">
-                    <div className='space-y-2 border rounded-md border-gray-100 w-1/3 p-4 min-h-40 bg-white shadow'>
+                <div className="bg-white rounded-lg p-0">
+                  <div className="flex justify-between items-center mb-4 gap-4 mt-8">
+                    <div className='space-y-2 border rounded-md border-gray-400 w-1/3 p-4 min-h-40'>
                       <h3 className="text-lg font-bold mb-2">{selectedCandidate.first_name} {selectedCandidate.last_name}</h3>
                       <p><strong>Email:</strong> {selectedCandidate.email}</p>
                       <p><strong>Phone:</strong> {selectedCandidate.phone}</p>
                       <p><strong>Notes:</strong> {selectedCandidate.misc_notes}</p>
                     </div>
-                    <div className='space-y-2 border rounded-md border-gray-100 w-2/3 p-4 min-h-40 bg-white shadow'>
+                    <div className='space-y-2 border rounded-md border-gray-400 w-2/3 p-4 min-h-40'>
                       <p><strong>Degree:</strong> {selectedCandidate.degree}</p>
                       <p><strong>Specialties:</strong> {selectedCandidate.specialty.join(', ')}</p>
                       <p><strong>Preferred Shift:</strong> {selectedCandidate.preferred_shift.join(', ')}</p>
@@ -479,7 +470,7 @@ export default function RecruiterCandidatesList() {
                 </div>
 
                 {/* Matching Jobs Grouped by Strength */}
-                <div className="">
+                <div className="bg-white rounded-lg p-4">
                   <h4 className="font-bold text-2xl mb-2">Matching Jobs</h4>
                   {jobsLoading ? (
                     <div className="flex flex-col flex-nowrap justify-center items-center text-center h-full w-full">
@@ -492,11 +483,11 @@ export default function RecruiterCandidatesList() {
                   ) : (
                     <>
                       <TabGroup index={activeMatchesTabIndex} onIndexChange={setActiveMatchesTabIndex}>
-                        <TabList className='mb-6'>
-                          <Tab className={`px-4 py-2 text-sm cursor-pointer rounded-md ${activeMatchesTabIndex === 0 ? 'bg-[#21C55E] text-white' : ''}`}>Perfect Matches</Tab>
-                          <Tab className={`px-4 py-2 text-sm cursor-pointer rounded-md ${activeMatchesTabIndex === 1 ? 'bg-[#F59E0B] text-white' : ''}`}>Strong Matches</Tab>
-                          <Tab className={`px-4 py-2 text-sm cursor-pointer rounded-md ${activeMatchesTabIndex === 2 ? 'bg-[#FA7315] text-white' : ''}`}>Possible Matches</Tab>
-                          <Tab className={`px-4 py-2 text-sm cursor-pointer rounded-md ${activeMatchesTabIndex === 3 ? 'bg-[#EF4444] text-white' : ''}`}>Weak Matches</Tab>
+                        <TabList>
+                          <Tab className={`px-4 py-2 text-sm cursor-pointer rounded-md ${activeMatchesTabIndex === 0 ? 'bg-green-500 text-white' : ''}`}>Perfect Matches</Tab>
+                          <Tab className={`px-4 py-2 text-sm cursor-pointer rounded-md ${activeMatchesTabIndex === 1 ? 'bg-yellow-500 text-white' : ''}`}>Strong Matches</Tab>
+                          <Tab className={`px-4 py-2 text-sm cursor-pointer rounded-md ${activeMatchesTabIndex === 2 ? 'bg-orange-500 text-white' : ''}`}>Possible Matches</Tab>
+                          <Tab className={`px-4 py-2 text-sm cursor-pointer rounded-md ${activeMatchesTabIndex === 3 ? 'bg-red-600 text-white' : ''}`}>Weak Matches</Tab>
                         </TabList>
                         <TabPanels>
                           {/* Perfect Matches */}
@@ -533,10 +524,75 @@ export default function RecruiterCandidatesList() {
               <p>Select a candidate to view details.</p>
             )}
           </TabPanel>
+          {/*<TabPanel>*/}
+          {/*  {selectedCandidate ? (*/}
+          {/*    <div className='flex flex-col gap-8 pb-4'>*/}
+          {/*      <div className="bg-white rounded-lg p-0">*/}
+          {/*        <div className="flex justify-between items-center mb-4 gap-4 mt-8">*/}
+          {/*          <div className='space-y-2 border rounded-md border-gray-400 w-1/3 p-4 min-h-40'>*/}
+          {/*            <h3 className="text-lg font-bold mb-2">{selectedCandidate.first_name} {selectedCandidate.last_name}</h3>*/}
+          {/*            <p><strong>Email:</strong> {selectedCandidate.email}</p>*/}
+          {/*            <p><strong>Phone:</strong> {selectedCandidate.phone}</p>*/}
+          {/*            <p><strong>Notes:</strong> {selectedCandidate.misc_notes}</p>*/}
+          {/*          </div>*/}
+          {/*          <div className='space-y-2 border rounded-md border-gray-400 w-2/3 p-4 min-h-40'>*/}
+          {/*            <p><strong>Degree:</strong> {selectedCandidate.degree}</p>*/}
+          {/*            <p><strong>Specialties:</strong> {selectedCandidate.specialty.join(', ')}</p>*/}
+          {/*            <p><strong>Preferred Shift:</strong> {selectedCandidate.preferred_shift.join(', ')}</p>*/}
+          {/*            <p><strong>Preferred Location:</strong> {selectedCandidate.preferred_location.join(', ')}</p>*/}
+          {/*          </div>*/}
+          {/*        </div>*/}
+          {/*      </div>*/}
+          {/*      <div className="bg-white rounded-lg p-0">*/}
+          {/*        <div className="mt-4">*/}
+          {/*          <h4 className="font-bold text-2xl mb-2">Matching Jobs</h4>*/}
+          {/*          {jobsLoading ? (*/}
+          {/*            <div className="flex flex-col flex-nowrap justify-center items-center text-center h-full w-full">*/}
+          {/*              <Skeleton width="100%" className="mb-4 min-h-30 min-w-full" />*/}
+          {/*              <Skeleton width="100%" className="mb-4 min-h-30 min-w-full" />*/}
+          {/*              <Skeleton width="100%" className="mb-4 min-h-30 min-w-full" />*/}
+          {/*            </div>*/}
+          {/*          ) : (*/}
+          {/*            <>*/}
+          {/*              {matchedJobs.length === 0 ? (*/}
+          {/*                <p>No matching jobs found.</p>*/}
+          {/*              ) : (*/}
+          {/*                <>*/}
+          {/*                  {matchedJobs.map(job => (*/}
+          {/*                    <div key={job.job_id} className="p-3 border rounded mb-2">*/}
+          {/*                      <span className='text-[10px] text-gray-600'><strong>ID: </strong>{job.job_id}</span>*/}
+          {/*                      <div className="flex justify-between">*/}
+          {/*                        <strong>{job.job_title}</strong>*/}
+          {/*                        <Link href={`/job/${job.job_id}`} className='flex items-center justify-center gap-1 text-center px-4 py-2 rounded-md transition cursor-pointer text-[13px] duration-700 text-white  bg-linear-to-br from-red-600 to-red-800'>*/}
+          {/*                          <ImInfo  color="white" size={16}/>*/}
+          {/*                          <span className="flex items-center text-white text-xs leading-1">View Job Details</span>*/}
+          {/*                        </Link>*/}
+          {/*                      </div>*/}
+          {/*                      <div className="text-sm mt-1">*/}
+          {/*                        <span>{safeArray(job.job_specialty).join(", ")} | {" "} {safeArray(job.job_shift).join(", ")} | {" "} {job.job_city ? job.job_city + ", " : ""} {safeArray(job.job_state).join(", ")}</span>*/}
+          {/*                      </div>*/}
+          {/*                      <div className='max-w-32 mt-4 ml-[-2px]'>*/}
+          {/*                        {getMatchLabel(job.matchScore)}*/}
+          {/*                      </div>*/}
+
+          {/*                    </div>*/}
+          {/*                  ))}*/}
+          {/*                </>*/}
+          {/*              )}*/}
+          {/*            </>*/}
+          {/*          )}*/}
+
+          {/*        </div>*/}
+          {/*      </div>*/}
+          {/*    </div>*/}
+          {/*  ) : (*/}
+          {/*    <p>Select a candidate to view details.</p>*/}
+          {/*  )}*/}
+          {/*</TabPanel>*/}
 
           {/* Add New Candidate */}
           <TabPanel>
-            <div className='space-y-2 border rounded-md border-gray-100  p-4 min-h-40 bg-white shadow'>
+
             <form
               className='mt-4 flex flex-col gap-5 w-full'
               onSubmit={handleUpdateAddCandidate}
@@ -622,10 +678,8 @@ export default function RecruiterCandidatesList() {
                     className='w-full border p-2 rounded bg-white'
                   >
                     <option value=''>Select Degree</option>
-                    <option value='RN'>RN</option>
-                    <option value='Allied'>Allied</option>
-                    <option value='Therapy'>Therapy</option>
-                    <option value='LPN'>LPN</option>
+                    <option value='LPN'>RN</option>
+                    <option value='ADN'>Allied</option>
                   </select>
                 </div>
 
@@ -708,7 +762,6 @@ export default function RecruiterCandidatesList() {
                 </button>
               </div>
             </form>
-            </div>
           </TabPanel>
         </TabPanels>
       </TabGroup>

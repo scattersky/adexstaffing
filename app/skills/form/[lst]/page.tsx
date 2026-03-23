@@ -26,6 +26,8 @@ export default function SkillsChecklists() {
     return null;
   }
 
+
+
   const [questions, setQuestions] = useState<Question[]>([]);
   const [loading, setLoading] = useState(true);
   const { user, loading: authLoading } = useAuth();

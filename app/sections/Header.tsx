@@ -69,7 +69,7 @@ export default function Header() {
           )}
 
           <li>
-            <ExpandableContactScreen />
+            <ExpandableContactScreen buttonText="Contact Us"/>
           </li>
 
           {!loading && !user && (

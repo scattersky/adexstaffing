@@ -21,6 +21,9 @@ import {RiLogoutBoxLine} from "react-icons/ri";
 import {signOut} from "firebase/auth";
 import {auth} from "@/lib/firebase";
 import RecruiterCandidatesList from "@/components/RecruiterCandidatesList";
+import RecruiterNotifications from "@/components/RecruiterNotifications";
+import ExpandableContactScreen from "@/components/ExpandableContactScreen";
+
 
 interface UserProfile {
   id: number;
@@ -78,7 +81,7 @@ export default function RecruiterDashboard() {
     try {
       const res = await axios.get(
         "https://adextravelnursing.com/api_get_candidates.php",
-        { params: { uid: user.uid } }
+        { params: { uid: user?.uid } }
       );
 
       setCandidates(Array.isArray(res.data) ? res.data : [res.data]);
@@ -89,9 +92,6 @@ export default function RecruiterDashboard() {
   useEffect(() => {
     fetchCandidates();
   }, [user]);
-
-
-
 
   const fetchSavedJobs = async () => {
     if (!user) return;
@@ -164,7 +164,6 @@ export default function RecruiterDashboard() {
     setSavedJobsVisible(false);
     setCalendarVisible(false);
   }
-
   const handleSavedJobsVisibility = () => {
     setNotificationsVisible(false)
     setCandidatesVisible(false)
@@ -211,6 +210,7 @@ export default function RecruiterDashboard() {
                   <div className="flex justify-center items-center px-2 py-1 w-30 rounded-md bg-red-800 ml-[-2px] mb-6">
                     <span className="text-white text-[11px] leading-3 mt-1  font-medium uppercase tracking-widest">RECRUITER</span>
                   </div>
+
                 </div>
 
 
@@ -278,10 +278,11 @@ export default function RecruiterDashboard() {
                 </div>
               </div>
               <div className="mt-3">
-                <Link href='contact/' className='w-full flex items-start justify-start gap-1 text-xs  text-blue-900 rounded-lg  transition cursor-pointer'>
-                  <ImLifebuoy size={18} className="text-blue-900"/>
-                  <span>Need Help?</span>
-                </Link>
+                <div className='w-full flex items-start justify-start gap-1 text-xs  text-white rounded-lg  transition cursor-pointer'>
+                  <ImLifebuoy size={18} className="text-white"/>
+
+                  <ExpandableContactScreen buttonText='Need Help?'/>
+                </div>
 
               </div>
             </div>
@@ -302,29 +303,23 @@ export default function RecruiterDashboard() {
               </div>
               <div className='p-8 w-full'>
 
-
               {/*PANEL: NOTIFICATIONS */}
               {notificationsVisible && (
-                <div className="flex flex-col items-start justify-start gap-2 bg-white rounded-lg p-4 shadow-lg w-full">
-
+                <div className="flex flex-col items-start justify-start gap-2  w-full">
+                  {user?.uid && <RecruiterNotifications recruiterUid={user.uid} />}
                 </div>
               )}
 
               {/*PANEL: CANDIDATES*/}
               {candidatesVisible && (
-                <div className="flex flex-col items-start justify-start gap-2 bg-white rounded-lg p-4 shadow-lg w-full">
+                <div className="flex flex-col items-start justify-start gap-2  w-full">
                   <RecruiterCandidatesList />
-
-
                 </div>
               )}
-
-
 
               {/*PANEL: SAVED JOBS */}
               {savedJobsVisible && (
                 <div className="flex flex-col items-start justify-start gap-2 bg-white rounded-lg p-4 shadow-lg w-full">
-
                   <div className="min-w-full">
                     <div
                       className="overflow-x-auto [&::-webkit-scrollbar]:h-2 [&::-webkit-scrollbar-thumb]:rounded-none [&::-webkit-scrollbar-track]:bg-scrollbar-track [&::-webkit-scrollbar-thumb]:bg-scrollbar-thumb">
@@ -368,14 +363,11 @@ export default function RecruiterDashboard() {
                                   type="button"
                                   onClick={() =>{handleUnsaveJob(job.job_id)}}
                                   className="text-xs font-semibold text-red-700 cursor-pointer  focus:outline-hidden  disabled:opacity-50 disabled:pointer-events-none"><FaRegTrashAlt />
-
                                 </button>
                               </div>
-
                             </td>
                           </tr>
                         ))}
-
                         </tbody>
                       </table>
                     </div>
@@ -386,7 +378,6 @@ export default function RecruiterDashboard() {
               {/*PANEL: CALENDAR */}
               {calendarVisible && (
                 <div className="flex flex-col items-start justify-start gap-2 bg-white rounded-lg p-4 shadow-lg w-full">
-
                   <MyCalendar />
                 </div>
               )}
@@ -398,11 +389,8 @@ export default function RecruiterDashboard() {
                 </div>
               )}
               </div>
-
             </div>
           </div>
-
-
         </section>
       </div>
       <ToastContainer/>

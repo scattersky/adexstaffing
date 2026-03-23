@@ -9,6 +9,7 @@ export default function InnerPageTitle({ title, subHeading }: Props) {
 
   const params = useParams();
   const lst = params.lst as string;
+  const checklistSubHeading = decodeURIComponent(lst);
   // if (!lst) {
   //   return null;
   // }
@@ -36,7 +37,7 @@ export default function InnerPageTitle({ title, subHeading }: Props) {
             <span className='font-extrabold bg-gradient-to-r from-red-800 to-red-600 bg-clip-text text-transparent text-3xl md:text-3xl lg:text-5xl ' >{title}</span>
           </h1>
           <h3 className="relative z-10 text-xs md:text-sm whitespace-normal  font-normal text-neutral-800 ">
-            {lst ? lst : subHeading}
+            {checklistSubHeading ? checklistSubHeading : subHeading}
           </h3>
 
 

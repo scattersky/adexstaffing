@@ -10,7 +10,11 @@ import Link from "next/link";
 import {FaPhone, FaPhoneAlt} from "react-icons/fa";
 import {FaPhoneFlip} from "react-icons/fa6";
 
-export default function ExpandableContactScreen() {
+type Props = {
+  buttonText: string;
+};
+
+export default function ExpandableContactScreen({buttonText}: Props) {
   const [form, setForm] = useState({
     name: "",
     phone: "",
@@ -50,16 +54,19 @@ export default function ExpandableContactScreen() {
     <ExpandableScreen
       layoutId="cta-card"
       triggerRadius="100px"
-      contentRadius="24px"
+      contentRadius="20px"
     >
       <ExpandableScreenTrigger>
         <button className="cursor-pointer">
-          Contact Us
+
+          {buttonText ? buttonText : 'Contact Us'}
         </button>
       </ExpandableScreenTrigger>
 
-      <ExpandableScreenContent className="bg-primary">
-        <div className="flex h-full items-center justify-center p-8 gap-8">
+      <ExpandableScreenContent className="bg-primary rounded-3xl overflow-hidden ">
+
+        <div className="flex h-full items-center justify-center p-8 gap-8 rounded-3xl border-0 border-transparent relative">
+          <ShineBorder shineColor={["#ff0000", "#bd000f", "#440000"]} borderWidth={2}/>
           <div className="w-full max-w-1/3 p-4">
             <h2 className="text-6xl font-black text-white">
               Let’s Connect
@@ -92,11 +99,11 @@ export default function ExpandableContactScreen() {
           </div>
           <div className="w-full max-w-1/3 p-4">
 
-            <div className="flex flex-col items-start justify-start gap-1 bg-white rounded-lg px-6 py-8 shadow-lg w-full relative">
-              <ShineBorder shineColor={["#ff0000", "#bd000f", "#440000"]} borderWidth={2}/>
+            <div className="flex flex-col items-start justify-start gap-1 bg-white rounded-lg px-6 py-8 shadow-lg w-full relative border-2 border-red-700">
 
 
-              <form onSubmit={handleSubmit} className="space-y-4 w-full">
+
+              <form onSubmit={handleSubmit} className="space-y-4 w-full ">
 
                 <div className="">
                   <label className="block text-gray-700 font-medium mb-1">Full Name</label>
