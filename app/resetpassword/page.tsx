@@ -22,7 +22,7 @@ export default function ResetPasswordPage() {
   const [message, setMessage] = useState("");
   const [loggedIn, setLoggedIn] = useState(false);
 
-  // Detect if user is logged in
+  // Detect logged-in user
   useEffect(() => {
     if (auth.currentUser) setLoggedIn(true);
   }, []);
@@ -57,11 +57,9 @@ export default function ResetPasswordPage() {
       setError("");
 
       if (loggedIn) {
-        // Logged-in user: update password directly
         await updatePassword(auth.currentUser!, password);
         setMessage("Password updated successfully!");
       } else if (oobCode) {
-        // Logged-out user: reset via oobCode
         await confirmPasswordReset(auth, oobCode, password);
         setMessage("Password reset successful! Redirecting...");
         setTimeout(() => router.push("/login"), 2000);
@@ -83,7 +81,6 @@ export default function ResetPasswordPage() {
     }
   };
 
-  // Show placeholder until code is validated or user is logged in
   if (!oobCode && !loggedIn && !error) {
     return <p className="text-center mt-10">Validating reset link...</p>;
   }
