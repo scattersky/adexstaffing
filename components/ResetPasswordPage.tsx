@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import {
   verifyPasswordResetCode,
@@ -10,15 +10,10 @@ import {
 import { auth } from "@/lib/firebase";
 
 export default function ResetPasswordPage() {
-  const searchParams = useSearchParams(); // client-only
-  const [oobCode, setOobCode] = useState<string | null>(null);
-
-  useEffect(() => {
-    const code = searchParams.get('oobCode'); // read only in useEffect
-    if (code) setOobCode(code);
-  }, [searchParams]);
+  const searchParams = useSearchParams();
   const router = useRouter();
 
+  const [oobCode, setOobCode] = useState<string | null>(null);
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPasswordInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -32,7 +27,7 @@ export default function ResetPasswordPage() {
     if (auth.currentUser) setLoggedIn(true);
   }, []);
 
-  // Read oobCode only on client
+  // Read oobCode safely on client
   useEffect(() => {
     const code = searchParams.get("oobCode");
     if (code) setOobCode(code);
@@ -62,23 +57,21 @@ export default function ResetPasswordPage() {
       setError("");
 
       if (loggedIn) {
-        // Logged-in user: change password
         await updatePassword(auth.currentUser!, password);
         setMessage("Password updated successfully!");
       } else if (oobCode) {
-        // Logged-out user: reset via oobCode
         await confirmPasswordReset(auth, oobCode, password);
         setMessage("Password reset successful! Redirecting...");
         setTimeout(() => router.push("/login"), 2000);
       } else {
-        setError("Cannot reset password: no valid session or reset code.");
+        setError("No valid session or reset code found.");
       }
     } catch (err: any) {
       if (err.code === "auth/weak-password") {
-        setError("Password should be at least 6 characters.");
+        setError("Password must be at least 6 characters.");
       } else if (err.code === "auth/requires-recent-login") {
         setError(
-          "You need to re-login to change your password. Please log out and log in again."
+          "Please log out and log in again to change your password."
         );
       } else {
         setError("Failed to update password.");
@@ -88,7 +81,6 @@ export default function ResetPasswordPage() {
     }
   };
 
-  // Show a loading state until we know if there is a valid code or logged-in user
   if (!oobCode && !loggedIn && !error) {
     return <p className="text-center mt-10">Validating reset link...</p>;
   }
