@@ -9,7 +9,10 @@ export default function DashboardRouter() {
   const router = useRouter();
 
   useEffect(() => {
-    if (!role) return;
+    if (!role) {
+      router.push("/login");
+      return;
+    };
 
     router.push(`/dashboard/${role}`);
   }, [role]);
