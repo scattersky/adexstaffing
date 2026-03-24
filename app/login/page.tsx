@@ -9,6 +9,7 @@ import {
 import { auth } from "@/lib/firebase";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import Link from "next/link";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -16,6 +17,7 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const router = useRouter();
+  const [message, setMessage] = useState("");
 
   // Optional: redirect if already logged in
   useEffect(() => {
@@ -23,6 +25,8 @@ export default function LoginPage() {
       router.push("/dashboard");
     }
   }, [router]);
+
+
 
   const handleLogin = async () => {
     try {
@@ -41,6 +45,7 @@ export default function LoginPage() {
       setLoading(false);
     }
   };
+
 
   if (loading) {
     return (
@@ -86,6 +91,17 @@ export default function LoginPage() {
           >
             {loading ? "Logging in..." : "Login"}
           </button>
+
+
+          <div className="flex justify-between items-center mt-2">
+            <Link
+              href="/forgotpassword"
+              className="text-sm text-blue-600 hover:underline"
+            >
+              Forgot Password?
+            </Link>
+          </div>
+
         </div>
       </div>
 

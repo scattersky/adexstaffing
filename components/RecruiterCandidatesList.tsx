@@ -39,6 +39,7 @@ interface UserProfile {
   years_experience: string;
 }
 interface AddCandidateForm {
+  id: number;
   firebase_uid: string;
   first_name: string;
   last_name: string;
@@ -69,6 +70,10 @@ export default function RecruiterCandidatesList() {
   const [addCandidateFormLoading, setAddCandidateFormLoading] = useState(false);
   const [specialtyOptions, setSpecialtyOptions] = useState<any[]>([]);
   const [status, setStatus] = useState<any>('');
+  const [editCandidateModalOpen, setEditCandidateModalOpen] = useState(false);
+  const [editCandidateForm, setEditCandidateForm] = useState<AddCandidateForm | null>(null);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [candidateToDelete, setCandidateToDelete] = useState<{ id: number; name: string } | null>(null);
 
   useEffect(() => {
     if (!user) return;
@@ -263,6 +268,7 @@ export default function RecruiterCandidatesList() {
   ];
   // Add New Candidate
   const [addCandidateForm, setAddCandidateForm] = useState<AddCandidateForm>({
+    id: 0,
     firebase_uid: '',
     first_name: '',
     last_name: '',
@@ -341,6 +347,7 @@ export default function RecruiterCandidatesList() {
 
         // Reset the form
         setAddCandidateForm({
+          id: 0,
           firebase_uid: '',
           first_name: '',
           last_name: '',
@@ -401,10 +408,52 @@ export default function RecruiterCandidatesList() {
     }
   };
 
+  const confirmDeleteCandidate = async () => {
+    if (!candidateToDelete) return;
+
+    try {
+      await axios.post(
+        "https://adextravelnursing.com/api_delete_candidate.php",
+        { candidate_id: candidateToDelete.id },
+        { headers: { "Content-Type": "application/json" } }
+      );
+
+      toast.success(`Candidate ${candidateToDelete.name} deleted successfully!`,{
+        position: "bottom-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: false,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+        transition: Slide,
+      });
+      fetchCandidates(); // refresh candidate list
+      setSelectedCandidate(null); // clear details tab
+    } catch (err) {
+      console.error(err);
+      toast.error('Failed to delete candidate.',{
+        position: "bottom-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: false,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+        transition: Slide,
+      });
+    } finally {
+      setIsDeleteModalOpen(false);
+      setCandidateToDelete(null);
+    }
+  };
+
   return (
     <>
       <TabGroup index={activeTabIndex} onIndexChange={setActiveTabIndex} className="mt-2">
-        <TabList>
+        <TabList className='mb-6'>
           <Tab className={`px-4 py-2 cursor-pointer rounded-md ${activeTabIndex === 0 ? 'bg-sky-900 text-white' : ''}`}>Candidates</Tab>
           <Tab className={`px-4 py-2 cursor-pointer rounded-md ${activeTabIndex === 1 ? 'bg-sky-900  text-white' : ''}`} disabled={!selectedCandidate}>Details</Tab>
           <Tab className={`px-4 py-2 cursor-pointer rounded-md ${activeTabIndex === 2 ? 'bg-sky-900  text-white' : ''}`}>Add New</Tab>
@@ -414,6 +463,8 @@ export default function RecruiterCandidatesList() {
           {/* Candidates List */}
           <TabPanel>
             <div className='border rounded-md border-gray-100 w-full p-4 min-h-40 bg-white shadow'>
+              <h2 className="text-lg font-bold">Candidates</h2>
+
             {candidatesLoading ? (
               <div className="flex justify-center items-center text-center h-64 w-full">
                 <div className="flex flex-col flex-nowrap justify-center items-center text-center h-full w-full">
@@ -463,17 +514,41 @@ export default function RecruiterCandidatesList() {
                 {/* Candidate Info */}
                 <div className=" rounded-lg p-0">
                   <div className="flex justify-between items-start mb-4 gap-4">
-                    <div className='space-y-2 border rounded-md border-gray-100 w-1/3 p-4 min-h-40 bg-white shadow'>
+                    <div className='space-y-2 border rounded-md border-gray-100 w-4/12 p-4 min-h-40 bg-white shadow'>
+                      <span className='text-[10px] text-gray-600'><strong>ID: </strong>{selectedCandidate.id}</span>
                       <h3 className="text-lg font-bold mb-2">{selectedCandidate.first_name} {selectedCandidate.last_name}</h3>
                       <p><strong>Email:</strong> {selectedCandidate.email}</p>
                       <p><strong>Phone:</strong> {selectedCandidate.phone}</p>
                       <p><strong>Notes:</strong> {selectedCandidate.misc_notes}</p>
+
                     </div>
-                    <div className='space-y-2 border rounded-md border-gray-100 w-2/3 p-4 min-h-40 bg-white shadow'>
+                    <div className='space-y-2 border rounded-md border-gray-100 w-6/12 p-4 min-h-40 bg-white shadow'>
                       <p><strong>Degree:</strong> {selectedCandidate.degree}</p>
                       <p><strong>Specialties:</strong> {selectedCandidate.specialty.join(', ')}</p>
                       <p><strong>Preferred Shift:</strong> {selectedCandidate.preferred_shift.join(', ')}</p>
                       <p><strong>Preferred Location:</strong> {selectedCandidate.preferred_location.join(', ')}</p>
+                    </div>
+                    <div className='gap-2 w-2/12 min-h-40 border rounded-md border-gray-100 p-4 min-h-40 bg-white shadow'>
+                      <div className="flex flex-col gap-2 ">
+                        <Button
+                          className="bg-sky-900 hover:bg-sky-800 text-white px-4 py-2 rounded-md cursour-pointer"
+                          onClick={() => {
+                            setEditCandidateForm({ ...selectedCandidate }); // populate form with current candidate data
+                            setEditCandidateModalOpen(true);
+                          }}
+                        >
+                          Edit Candidate
+                        </Button>
+                        <Button
+                          className="bg-red-700 hover:bg-red-600 text-white px-4 py-2 rounded-md cursor-pointer"
+                          onClick={() => {
+                            setCandidateToDelete({ id: selectedCandidate.id, name: `${selectedCandidate.first_name} ${selectedCandidate.last_name}` });
+                            setIsDeleteModalOpen(true);
+                          }}
+                        >
+                          Delete Candidate
+                        </Button>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -537,6 +612,11 @@ export default function RecruiterCandidatesList() {
           {/* Add New Candidate */}
           <TabPanel>
             <div className='space-y-2 border rounded-md border-gray-100  p-4 min-h-40 bg-white shadow'>
+              <div className="flex flex-col gap-1">
+                <h2 className="text-lg font-bold">Add New Candidate</h2>
+                <span className="text-xs text-gray-500">(All Fields Required)</span>
+              </div>
+
             <form
               className='mt-4 flex flex-col gap-5 w-full'
               onSubmit={handleUpdateAddCandidate}
@@ -555,6 +635,7 @@ export default function RecruiterCandidatesList() {
                     value={addCandidateForm?.first_name}
                     onChange={handleAddCandidateFormChange}
                     className='w-full border p-2 rounded '
+                    required
                   />
                 </div>
                 <div className='flex flex-col w-full'>
@@ -570,6 +651,7 @@ export default function RecruiterCandidatesList() {
                     value={addCandidateForm?.last_name}
                     onChange={handleAddCandidateFormChange}
                     className='w-full border p-2 rounded'
+                    required
                   />
                 </div>
               </div>
@@ -588,6 +670,7 @@ export default function RecruiterCandidatesList() {
                     value={addCandidateForm?.email}
                     onChange={handleAddCandidateFormChange}
                     className='w-full border p-2 rounded'
+                    required
                   />
                 </div>
                 <div className='flex flex-col w-full'>
@@ -603,6 +686,7 @@ export default function RecruiterCandidatesList() {
                     value={addCandidateForm?.phone}
                     onChange={handleAddCandidateFormChange}
                     className='w-full border p-2 rounded'
+                    required
                   />
                 </div>
               </div>
@@ -618,6 +702,7 @@ export default function RecruiterCandidatesList() {
                   <select
                     name='degree'
                     value={addCandidateForm?.degree}
+                    required
                     onChange={handleAddCandidateFormChange}
                     className='w-full border p-2 rounded bg-white'
                   >
@@ -650,6 +735,7 @@ export default function RecruiterCandidatesList() {
                   className="w-full"
                   display="chip"
                   filter
+                  required
                   showClear
                 />
               </div>
@@ -670,6 +756,7 @@ export default function RecruiterCandidatesList() {
                   }
                   placeholder="Select Shifts"
                   className="w-full"
+                  required
                   display="chip"
                 />
               </div>
@@ -690,6 +777,7 @@ export default function RecruiterCandidatesList() {
                   }
                   placeholder="Select States"
                   className="w-full "
+                  required
                   display="chip"
                   filter
                   showClear
@@ -712,6 +800,169 @@ export default function RecruiterCandidatesList() {
           </TabPanel>
         </TabPanels>
       </TabGroup>
+      {editCandidateModalOpen && editCandidateForm && (
+        <div className="fixed inset-0 flex items-center justify-center bg-[rgba(0,0,0,0.7)] z-50">
+          <div className="bg-white p-6 rounded-md w-full max-w-3xl space-y-4">
+            <h3 className="text-lg font-bold">Edit Candidate</h3>
+
+            <input
+              type="text"
+              placeholder="First Name"
+              name="first_name"
+              value={editCandidateForm.first_name}
+              onChange={(e) =>
+                setEditCandidateForm({ ...editCandidateForm, first_name: e.target.value })
+              }
+              className="border p-2 w-full rounded"
+            />
+
+            <input
+              type="text"
+              placeholder="Last Name"
+              name="last_name"
+              value={editCandidateForm.last_name}
+              onChange={(e) =>
+                setEditCandidateForm({ ...editCandidateForm, last_name: e.target.value })
+              }
+              className="border p-2 w-full rounded"
+            />
+
+            <input
+              type="email"
+              placeholder="Email"
+              name="email"
+              value={editCandidateForm.email}
+              onChange={(e) =>
+                setEditCandidateForm({ ...editCandidateForm, email: e.target.value })
+              }
+              className="border p-2 w-full rounded"
+            />
+
+            <input
+              type="tel"
+              placeholder="Phone"
+              name="phone"
+              value={editCandidateForm.phone}
+              onChange={(e) =>
+                setEditCandidateForm({ ...editCandidateForm, phone: e.target.value })
+              }
+              className="border p-2 w-full rounded"
+            />
+
+            <MultiSelect
+              value={editCandidateForm.specialty}
+              options={specialtyOptions}
+              onChange={(e) =>
+                setEditCandidateForm({ ...editCandidateForm, specialty: e.value })
+              }
+              placeholder="Select Specialties"
+              className="w-full"
+              display="chip"
+              filter
+              showClear
+            />
+
+            <MultiSelect
+              value={editCandidateForm.preferred_shift}
+              options={shiftOptions}
+              onChange={(e) =>
+                setEditCandidateForm({ ...editCandidateForm, preferred_shift: e.value })
+              }
+              placeholder="Select Shifts"
+              className="w-full"
+              display="chip"
+            />
+
+            <MultiSelect
+              value={editCandidateForm.preferred_location}
+              options={stateOptions}
+              onChange={(e) =>
+                setEditCandidateForm({ ...editCandidateForm, preferred_location: e.value })
+              }
+              placeholder="Select States"
+              className="w-full"
+              display="chip"
+              filter
+              showClear
+            />
+
+            <div className="flex justify-end gap-2 mt-4">
+              <Button
+                className="bg-gray-400 hover:bg-gray-500 text-white px-4 py-2 rounded-md"
+                onClick={() => setEditCandidateModalOpen(false)}
+              >
+                Cancel
+              </Button>
+              <Button
+                className="bg-sky-900 hover:bg-sky-800 text-white px-4 py-2 rounded-md"
+                onClick={async () => {
+                  if (!editCandidateForm) return;
+                  try {
+                    await axios.post(
+                      "https://adextravelnursing.com/api_update_candidate.php",
+                      editCandidateForm,
+                      { headers: { "Content-Type": "application/json" } }
+                    );
+                    toast.success('Candidate updated successfully!',{
+                      position: "bottom-right",
+                      autoClose: 3000,
+                      hideProgressBar: false,
+                      closeOnClick: false,
+                      pauseOnHover: true,
+                      draggable: true,
+                      progress: undefined,
+                      theme: "colored",
+                      transition: Slide,
+                    });
+                    setEditCandidateModalOpen(false);
+                    fetchCandidates(); // refresh list
+                    if (selectedCandidate?.id === editCandidateForm.id) {
+                      setSelectedCandidate(editCandidateForm); // update details view
+                    }
+                  } catch (err) {
+                    console.error(err);
+                    toast.error('Failed to update candidate.',{
+                      position: "bottom-right",
+                      autoClose: 3000,
+                      hideProgressBar: false,
+                      closeOnClick: false,
+                      pauseOnHover: true,
+                      draggable: true,
+                      progress: undefined,
+                      theme: "colored",
+                      transition: Slide,
+                    });
+                  }
+                }}
+              >
+                Save
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+      {isDeleteModalOpen && candidateToDelete && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          <div className="bg-white rounded-md p-6 w-96 shadow-lg space-y-4">
+            <h3 className="text-lg font-bold">Confirm Delete</h3>
+            <p>Are you sure you want to delete <strong>{candidateToDelete.name}</strong>? This action cannot be undone.</p>
+            <div className="flex justify-end gap-3">
+              <Button
+                className="bg-gray-300 hover:bg-gray-400 text-black px-4 py-2 rounded"
+                onClick={() => setIsDeleteModalOpen(false)}
+              >
+                Cancel
+              </Button>
+              <Button
+                className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded"
+                onClick={confirmDeleteCandidate}
+              >
+                Delete
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
       <ToastContainer/>
     </>
   );

@@ -23,6 +23,7 @@ import {auth} from "@/lib/firebase";
 import RecruiterCandidatesList from "@/components/RecruiterCandidatesList";
 import RecruiterNotifications from "@/components/RecruiterNotifications";
 import ExpandableContactScreen from "@/components/ExpandableContactScreen";
+import RecruiterSettings from "@/components/RecruiterSettings";
 
 
 interface UserProfile {
@@ -385,7 +386,8 @@ export default function RecruiterDashboard() {
               {/*PANEL: SETTINGS */}
               {settingsVisible && (
                 <div className="flex flex-col items-start justify-start gap-2 bg-white rounded-lg p-4 shadow-lg w-full">
-
+                  <h2 className="text-lg font-bold">Settings</h2>
+                  <RecruiterSettings />
                 </div>
               )}
               </div>
