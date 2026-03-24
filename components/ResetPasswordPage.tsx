@@ -10,10 +10,15 @@ import {
 import { auth } from "@/lib/firebase";
 
 export default function ResetPasswordPage() {
-  const searchParams = useSearchParams();
+  const searchParams = useSearchParams(); // client-only
+  const [oobCode, setOobCode] = useState<string | null>(null);
+
+  useEffect(() => {
+    const code = searchParams.get('oobCode'); // read only in useEffect
+    if (code) setOobCode(code);
+  }, [searchParams]);
   const router = useRouter();
 
-  const [oobCode, setOobCode] = useState<string | null>(null); // store reset code
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPasswordInput] = useState("");
   const [loading, setLoading] = useState(false);
