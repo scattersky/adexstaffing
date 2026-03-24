@@ -1,4 +1,5 @@
 'use client';
+
 import { useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import {
@@ -12,8 +13,7 @@ export default function ResetPasswordPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
 
-  const oobCode = searchParams.get("oobCode"); // present for password reset via email
-
+  const [oobCode, setOobCode] = useState<string | null>(null); // store code in state
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPasswordInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -22,12 +22,18 @@ export default function ResetPasswordPage() {
   const [message, setMessage] = useState("");
   const [loggedIn, setLoggedIn] = useState(false);
 
-  // Detect if user is logged in
+  // Detect logged-in user
   useEffect(() => {
     if (auth.currentUser) setLoggedIn(true);
   }, []);
 
-  // Validate reset code if present
+  // Set oobCode from query params on client
+  useEffect(() => {
+    const code = searchParams.get("oobCode");
+    if (code) setOobCode(code);
+  }, [searchParams]);
+
+  // Validate reset code only if present
   useEffect(() => {
     if (!oobCode) return;
 
@@ -78,6 +84,11 @@ export default function ResetPasswordPage() {
     }
   };
 
+  // Show loading state until either code is validated or user is detected
+  if (!oobCode && !loggedIn && !error) {
+    return <p className="text-center mt-10">Validating reset link...</p>;
+  }
+
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-100">
       <div className="bg-white p-6 rounded shadow-md w-full max-w-md space-y-4">
@@ -97,7 +108,6 @@ export default function ResetPasswordPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
-
             <input
               type="password"
               placeholder="Confirm Password"
@@ -105,7 +115,6 @@ export default function ResetPasswordPage() {
               value={confirmPassword}
               onChange={(e) => setConfirmPasswordInput(e.target.value)}
             />
-
             <button
               onClick={handlePasswordChange}
               disabled={loading}
