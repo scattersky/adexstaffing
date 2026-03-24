@@ -13,12 +13,7 @@ export default function ResetPasswordPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
 
-  const [oobCode, setOobCode] = useState<string | null>(null);
-
-  useEffect(() => {
-    const code = searchParams.get('oobCode');
-    if (code) setOobCode(code);
-  }, [searchParams]);
+  const [oobCode, setOobCode] = useState<string | null>(null); // store reset code
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPasswordInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -32,13 +27,13 @@ export default function ResetPasswordPage() {
     if (auth.currentUser) setLoggedIn(true);
   }, []);
 
-  // Set oobCode from query params on client
+  // Read oobCode only on client
   useEffect(() => {
     const code = searchParams.get("oobCode");
     if (code) setOobCode(code);
   }, [searchParams]);
 
-  // Validate reset code only if present
+  // Validate reset code
   useEffect(() => {
     if (!oobCode) return;
 
@@ -52,7 +47,6 @@ export default function ResetPasswordPage() {
       setError("Please fill out both fields.");
       return;
     }
-
     if (password !== confirmPassword) {
       setError("Passwords do not match.");
       return;
@@ -63,7 +57,7 @@ export default function ResetPasswordPage() {
       setError("");
 
       if (loggedIn) {
-        // Logged-in user: change password directly
+        // Logged-in user: change password
         await updatePassword(auth.currentUser!, password);
         setMessage("Password updated successfully!");
       } else if (oobCode) {
@@ -89,7 +83,7 @@ export default function ResetPasswordPage() {
     }
   };
 
-  // Show loading state until either code is validated or user is detected
+  // Show a loading state until we know if there is a valid code or logged-in user
   if (!oobCode && !loggedIn && !error) {
     return <p className="text-center mt-10">Validating reset link...</p>;
   }
@@ -136,7 +130,7 @@ export default function ResetPasswordPage() {
           </>
         )}
 
-        {!oobCode && !loggedIn && (
+        {!oobCode && !loggedIn && !error && (
           <p className="text-gray-500 text-sm">
             No reset code provided and no user logged in.
           </p>
