@@ -192,7 +192,7 @@ export default function RecruiterDashboard() {
 
   return (
     <div>
-      {/*<InnerPageTitle title='Dashboard' subHeading='Recruiter' />*/}
+
 
       <div className="bg-gray-100 h-full">
         <section className="max-w-full mx-auto h-full">
