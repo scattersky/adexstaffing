@@ -55,9 +55,9 @@ export default function LoginPage() {
     );
   }
   return (
-    <div className="flex justify-center items-center h-screen bg-gray-200">
+    <div className="flex justify-center items-center h-[90vh] bg-gray-200">
       <div className="w-1/2 flex flex-col justify-center items-center">
-        <div className="max-w-md mx-auto mt-20 space-y-4 bg-white rounded-md shadow-sm p-5">
+        <div className="max-w-md mx-auto mt-0 space-y-4 bg-white rounded-md shadow-sm p-5">
           <Image
             src="/adexlogo.webp"
             alt="logo"
@@ -87,7 +87,7 @@ export default function LoginPage() {
           <button
             onClick={handleLogin}
             disabled={loading}
-            className="border border-red-700 bg-red-700 rounded-md text-white px-4 py-2 w-full disabled:opacity-50"
+            className="border border-red-700 bg-red-700 rounded-md text-white px-4 py-2 w-full disabled:opacity-50 cursor-pointer"
           >
             {loading ? "Logging in..." : "Login"}
           </button>
@@ -96,7 +96,7 @@ export default function LoginPage() {
           <div className="flex justify-between items-center mt-2">
             <Link
               href="/forgotpassword"
-              className="text-sm text-blue-600 hover:underline"
+              className="text-sm text-sky-700 hover:underline"
             >
               Forgot Password?
             </Link>
@@ -105,7 +105,7 @@ export default function LoginPage() {
         </div>
       </div>
 
-      <div className="w-1/2 bg-[url('/hero.jpeg')] bg-cover bg-right h-screen"></div>
+      <div className="w-1/2 bg-[url('/hero.jpeg')] bg-cover bg-right h-[90vh]"></div>
     </div>
   );
 }

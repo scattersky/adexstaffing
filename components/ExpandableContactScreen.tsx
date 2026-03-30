@@ -57,13 +57,13 @@ export default function ExpandableContactScreen({buttonText}: Props) {
       contentRadius="20px"
     >
       <ExpandableScreenTrigger>
-        <button className="cursor-pointer">
+        <button className="cursor-pointer  hover:text-red-700 text-gray-800 text-[15px] ">
 
           {buttonText ? buttonText : 'Contact Us'}
         </button>
       </ExpandableScreenTrigger>
 
-      <ExpandableScreenContent className="bg-primary rounded-3xl overflow-hidden ">
+      <ExpandableScreenContent className="bg-[#171717FF] rounded-3xl overflow-hidden ">
 
         <div className="flex h-full items-center justify-center p-8 gap-8 rounded-3xl border-0 border-transparent relative">
           <ShineBorder shineColor={["#ff0000", "#bd000f", "#440000"]} borderWidth={2}/>

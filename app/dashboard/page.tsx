@@ -2,32 +2,34 @@
 
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
-import {useEffect, useState} from "react";
+import { useEffect } from "react";
 
 export default function DashboardRouter() {
-  const { role } = useAuth();
+  const { user, role, loading } = useAuth(); // 👈 IMPORTANT: use loading from context
   const router = useRouter();
-  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (!role) {
-      return;
-    };
+    if (loading) return; // ⛔ wait for auth to resolve
 
-    if(role === 'admin' || role === 'recruiter' || role === 'candidate'){
-      router.push(`/dashboard/${role}`);
-    } else {
-      router.push('/login');
+    if (!user) {
+      router.replace("/login");
+      return;
     }
 
-  }, [role]);
+    if (role === "candidate") {
+      router.replace("/dashboard/candidate");
+    } else if (role === "recruiter") {
+      router.replace("/dashboard/recruiter");
+    } else {
+      // fallback if role somehow missing
+      router.replace("/login");
+    }
+  }, [user, role, loading, router]);
 
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center min-h-screen">
-        <div className="w-12 h-12 border-4 border-gray-300 border-t-red-700 rounded-full animate-spin"></div>
-      </div>
-    );
-  }
-  return null;
+  // 🔥 Spinner while auth is loading
+  return (
+    <div className="flex justify-center items-center min-h-screen">
+      <div className="w-12 h-12 border-4 border-gray-300 border-t-red-700 rounded-full animate-spin"></div>
+    </div>
+  );
 }

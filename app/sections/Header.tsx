@@ -5,11 +5,13 @@ import { useState, useEffect } from "react";
 import { getAuth, onAuthStateChanged, signOut, User } from "firebase/auth";
 import {app} from "@/lib/firebase";
 import ExpandableContactScreen from "@/components/ExpandableContactScreen";
+import {useRouter} from "next/navigation";
 
 export default function Header() {
   const auth = getAuth(app);
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const router = useRouter();
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
@@ -22,7 +24,11 @@ export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const handleLogout = async () => {
-    await signOut(auth);
+    await signOut(auth)
+      .then(()=>{
+          router.replace('/');
+      })
+
   };
   return (
     <div className="px-4 py-5 mx-auto sm:max-w-xl md:max-w-full lg:max-w-fulll md:px-24 lg:px-8 shadow-md z-50 relative">
@@ -45,28 +51,24 @@ export default function Header() {
               }}
               className='cursor-pointer'
             >
-              <div className='flex flex-row gap-2 items-center cursor-pointer font-normal text-gray-800 text-[15px]'>
+              <div className='flex flex-row gap-2 items-center cursor-pointer font-normal text-gray-800 text-[15px] hover:text-red-700'>
                Explore Jobs
               </div>
             </Link>
           </li>
 
-          {!loading && user && (
-            <>
-              <li>
-                <Link
-                  href={{
-                    pathname: '/skills'
-                  }}
-                  className='cursor-pointer'
-                >
-                  <div className='flex flex-row gap-2 items-center cursor-pointer font-normal text-gray-800 text-[15px]'>
-                    Skills Checklists
-                  </div>
-                </Link>
-              </li>
-            </>
-          )}
+          <li>
+            <Link
+              href={{
+                pathname: '/skills'
+              }}
+              className='cursor-pointer'
+            >
+              <div className='flex flex-row gap-2 items-center cursor-pointer font-normal text-gray-800 text-[15px] hover:text-red-700'>
+                Skills Checklists
+              </div>
+            </Link>
+          </li>
 
           <li>
             <ExpandableContactScreen buttonText="Contact Us"/>
@@ -167,7 +169,7 @@ export default function Header() {
                         href="/"
                         aria-label="Our product"
                         title="Our product"
-                        className="font-medium tracking-wide text-gray-700 transition-colors duration-200 hover:text-deep-purple-accent-400"
+                        className="font-medium tracking-wide text-gray-700 hover:text-red-700 transition-colors duration-200"
                       >
                         Explore Jobs
                       </a>
@@ -177,27 +179,18 @@ export default function Header() {
                         href="/skills"
                         aria-label="Our product"
                         title="Our product"
-                        className="font-medium tracking-wide text-gray-700 transition-colors duration-200 hover:text-deep-purple-accent-400"
+                        className="font-medium tracking-wide text-gray-700 hover:text-red-700 transition-colors duration-200"
                       >
                         Skills Checklists
                       </a>
                     </li>
-                    <li>
-                      <a
-                        href="/dashboard"
-                        aria-label="Product pricing"
-                        title="Product pricing"
-                        className="font-medium tracking-wide text-gray-700 transition-colors duration-200 hover:text-deep-purple-accent-400"
-                      >
-                        Dashboard
-                      </a>
-                    </li>
+
                     <li>
                       <a
                         href="/login"
                         aria-label="About us"
                         title="About us"
-                        className="font-medium tracking-wide text-gray-700 transition-colors duration-200 hover:text-deep-purple-accent-400"
+                        className="font-medium tracking-wide text-gray-700 hover:text-red-700 transition-colors duration-200"
                       >
                         Login
                       </a>
@@ -212,6 +205,30 @@ export default function Header() {
                         Sign up
                       </a>
                     </li>
+
+                    {!loading && user && (
+                      <>
+                        <li>
+                          <a
+                            href="/dashboard"
+                            aria-label="Product pricing"
+                            title="Product pricing"
+                            className="font-medium tracking-wide text-gray-700 hover:text-red-700 transition-colors duration-200"
+                          >
+                            Dashboard
+                          </a>
+                        </li>
+                        <li>
+                          <button
+                            onClick={handleLogout}
+                            className="font-medium tracking-wide text-gray-700 hover:text-red-700 transition-colors duration-200"
+                          >
+                            Logout
+                          </button>
+                        </li>
+                      </>
+                    )}
+
                   </ul>
                 </nav>
               </div>

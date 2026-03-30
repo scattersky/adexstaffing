@@ -12,7 +12,7 @@ import moment from "moment";
 import {FaArrowUpRightFromSquare} from "react-icons/fa6";
 import {AiOutlineSend} from "react-icons/ai";
 import Link from "next/link";
-import {RiFolderAddLine} from "react-icons/ri";
+import {RiFolderAddLine, RiLock2Fill} from "react-icons/ri";
 import {useAuth} from "@/context/AuthContext";
 import {ToastContainer, toast, Slide} from 'react-toastify';
 import renderHTML from 'react-render-html';
@@ -26,15 +26,10 @@ export default function SingleJobPage() {
   const [loading, setLoading] = useState(true);
   const isSaved = savedJobIds.includes(String(job?.job_id));
 
-  useEffect(() => {
-    if (!authLoading && !user) {
-      router.push("/login");
-    }
-  }, [user, authLoading]);
+
 
   useEffect(() => {
     if (!id) return;
-
     axios
       .get("https://adextravelnursing.com/api_get_single_job.php", {
         params: { job_id: id }
@@ -107,7 +102,11 @@ export default function SingleJobPage() {
     transition: Slide,
   });
 
-  if (loading) {
+  const handleGoToLogin = () => {
+    router.push('../login');
+  }
+
+  if (loading || authLoading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
         <div className="w-12 h-12 border-4 border-gray-300 border-t-red-700 rounded-full animate-spin"></div>
@@ -118,17 +117,16 @@ export default function SingleJobPage() {
 
   return (
     <div>
-      <InnerPageTitle title='Job Details' subHeading={job.job_title} />
+      <InnerPageTitle title='Job Details' />
       <div className="bg-gray-100 pt-2 pb-12">
         <section className="mt-12 max-w-7xl mx-auto md:px-8 min-h-screen">
           <div className="flex justify-between items-start gap-4 flex-wrap md:flex-nowrap px-4 md:px-0">
             {/*DASHBOARD LEFT*/}
             <div className="flex flex-col items-start justify-start gap-2 w-full md:w-[25%] h-screen" >
               <div className="flex flex-col items-start justify-start gap-1 bg-white rounded-lg p-4 shadow-lg w-full sticky top-4">
-                <h3 className="text-gray-700 text-md font-bold mb-0">
-                  Additional Details
-                </h3>
-                <hr className='bg-black w-full h-0.5 mb-3 opacity-20'/>
+                <div className="flex justify-center items-center px-2 pt-1 pb-2 w-45 rounded-md bg-sky-800 -ml-0.5 mb-1">
+                  <span className="text-white text-[11px] leading-3 mt-1  font-medium uppercase tracking-widest">ADDITIONAL DETAILS</span>
+                </div>
                 <div className='space-y-2 pb-2'>
                   <div className='flex items-center justify-start text-xs text-gray-600'>
                     <p className=' text-xs'><span className='font-bold  text-xs'>Location: </span>{job.job_city}, {job.job_state}</p>
@@ -177,24 +175,37 @@ export default function SingleJobPage() {
             {/*DASHBOARD RIGHT*/}
             <div className="flex flex-col items-start justify-start gap-4 w-full md:w-[15%] h-screen" >
               <div className="flex flex-col items-start justify-start gap-2  w-full pt-1  sticky top-4">
-                <Link href={'https://adextravelnursing.com/'} className='flex items-center justify-center w-full gap-1 text-center px-4 py-2 rounded-md border border-red-700 hover:border-red-600 hover:bg-linear-to-br hover:from-red-600 hover:to-red-900 bg-linear-to-br from-red-700 to-red-800 duration-700 transition cursor-pointer text-[13px]'>
-                  <AiOutlineSend color="white" size={16}  />
-                  <span className="flex items-center text-white text-xs">Apply Now</span>
-                </Link>
+                {user ?  (
+                  <Link href={`/apply/${job.job_id}`}  className='flex items-center justify-center gap-1 w-full text-center px-4 py-2 rounded-md  hover:bg-linear-to-br hover:from-red-600 hover:to-red-900 bg-linear-to-br from-red-700 to-red-800 transition cursor-pointer text-[13px]'>
+                    <AiOutlineSend color="white" size={16}  />
+                    <span className="flex items-center text-white text-xs">Apply Now</span>
+                  </Link>
+                ) : (
+                  <Link href="/login" className='flex items-center justify-center gap-1 w-full text-center px-4 py-2 rounded-md bg-[#995757] transition cursor-pointer text-[13px]'>
+                    <RiLock2Fill color="white" size={16}  />
+                    <span className="flex items-center text-white text-xs">Login To Apply</span>
+                  </Link>
+                )}
+                  {user ?  (
+                    <button
+                      onClick={handleSave}
+                      disabled={isSaved}
 
-                <button
-                  onClick={handleSave}
-                  disabled={isSaved}
-
-                  className={`flex items-center justify-center gap-1 w-full stext-center px-4 py-2 border rounded-md transition cursor-pointer text-[13px] duration-700 text-white ${
-                    isSaved
-                      ? "bg-gray-500 cursor-not-allowed"
-                      : "border border-sky-800 hover:border-sky-700  hover:bg-linear-to-br hover:from-sky-600 hover:to-cyan-900 bg-linear-to-br from-sky-700 to-cyan-900"
-                  }`}
-                >
-                  <RiFolderAddLine color="white" size={16} />
-                  <span className="flex items-center text-white text-xs">{isSaved ? "Job Saved" : "Save to My Jobs"}</span>
-                </button>
+                      className={`flex items-center justify-center gap-1 w-full text-center px-4 py-2 border rounded-md transition cursor-pointer text-[13px] duration-700 text-white ${
+                        isSaved
+                          ? "bg-gray-500 cursor-not-allowed"
+                          : "hover:bg-linear-to-br hover:from-sky-600 hover:to-cyan-900 bg-linear-to-br from-sky-700 to-cyan-900"
+                      }`}
+                    >
+                      <RiFolderAddLine color="white" size={16} />
+                      <span className="flex items-center text-white text-xs leading-1">{isSaved ? "Job Saved" : "Save to My Jobs"}</span>
+                    </button>
+                  ) : (
+                    <button onClick={handleGoToLogin} className='flex items-center justify-center gap-1 w-full text-center px-4 py-2 bg-gray-500 cursor-pointer duration-700 text-[13px] rounded-md transition '>
+                      <RiLock2Fill color="white" size={16}  />
+                      <span className="flex items-center text-white text-xs">Login To Save Job</span>
+                    </button>
+                  )}
                 <div>
 
 

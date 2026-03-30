@@ -15,7 +15,7 @@ import {FaMoneyCheckDollar} from "react-icons/fa6";
 import {MagicCard} from "@/components/magicui/magic-card";
 
 
-export function JobCard({
+function JobCard({
                           job,
                           savedJobIds,
                           setSavedJobIds
@@ -112,7 +112,9 @@ export function JobCard({
                   {renderHTML(job.job_description)}
                 </div>
                 <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-white to-transparent h-16 w-full"></div>
+
               </div>
+              <a href={`/job/${job.job_id}`} className='text-red-700 text-sm'>...Read More</a>
 
             </div>
             <div className="flex flex-col justify-start items-start mt-5 text-sm sm:mt-0 sm:space-y-2 max-w-50">
@@ -134,14 +136,6 @@ export function JobCard({
                   ${job.job_weekly_pay}/wk
                  </span>
               </div>
-              {/*<div className='flex items-start justify-start gap-2'>*/}
-              {/*  <div className='min-w-4'>*/}
-              {/*    <FaHospitalAlt size={16} color="gray"/>*/}
-              {/*  </div>*/}
-              {/*  <span className="flex items-center text-gray-500 wrap-break-word">*/}
-              {/*     {job.job_facility}*/}
-              {/*   </span>*/}
-              {/*</div>*/}
             </div>
           </div>
           <div className="mt-4 items-center space-y-4 text-sm sm:flex sm:space-x-4 sm:space-y-0">
@@ -185,11 +179,19 @@ export function JobCard({
                 </button>
               )}
 
-              <Link href={'https://adextravelnursing.com/'} className='flex items-center justify-center gap-1 text-center px-4 py-2 rounded-md  hover:bg-linear-to-br hover:from-red-600 hover:to-red-900 bg-linear-to-br from-red-700 to-red-800 transition cursor-pointer text-[13px]'>
-                <AiOutlineSend color="white" size={16}  />
-                <span className="flex items-center text-white text-xs">Apply Now</span>
-              </Link>
+              {user ?  (
+                <Link href={`/apply/${job.job_id}`}  className='flex items-center justify-center gap-1 text-center px-4 py-2 rounded-md  hover:bg-linear-to-br hover:from-red-600 hover:to-red-900 bg-linear-to-br from-red-700 to-red-800 transition cursor-pointer text-[13px]'>
+                  <AiOutlineSend color="white" size={16}  />
+                  <span className="flex items-center text-white text-xs">Apply Now</span>
+                </Link>
+              ) : (
+                <Link href="/login" className='flex items-center justify-center gap-1 text-center px-4 py-2 rounded-md  hover:bg-linear-to-br hover:from-red-600 hover:to-red-900 bg-linear-to-br from-red-700 to-red-800 transition cursor-pointer text-[13px]'>
+                  <RiLock2Fill color="white" size={16}  />
+                  <span className="flex items-center text-white text-xs">Login To Apply</span>
+                </Link>
+              )}
             </div>
+
 
           </div>
         </div>
@@ -198,3 +200,5 @@ export function JobCard({
 
   );
 }
+
+export default JobCard

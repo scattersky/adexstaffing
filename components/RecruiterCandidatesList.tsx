@@ -191,12 +191,10 @@ export default function RecruiterCandidatesList() {
       const res = await axios.get(
         "https://adextravelnursing.com/api_get_specialty_options.php"
       );
-
       const options = res.data.map((specialty: string) => ({
         label: specialty,
         value: specialty
       }));
-
       setSpecialtyOptions(options);
     } catch (err) {
       console.error("Error fetching specialties:", err);

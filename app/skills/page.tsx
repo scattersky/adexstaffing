@@ -34,11 +34,11 @@ export default function CheckLists() {
   const router = useRouter();
   const [activeTabIndex, setActiveTabIndex] = useState(0);
 
-  useEffect(() => {
-    if (!authLoading && !user) {
-      router.push("/login");
-    }
-  }, [user, authLoading]);
+  // useEffect(() => {
+  //   if (!authLoading && !user) {
+  //     router.push("/login");
+  //   }
+  // }, [user, authLoading]);
 
   const fetchChecklistsRN = async () => {
     axios
@@ -83,7 +83,7 @@ export default function CheckLists() {
 
   return (
     <div>
-      <InnerPageTitle title='Skills Checklists' subHeading=''/>
+      <InnerPageTitle title='Skills Checklists'/>
 
       <div className="bg-gray-100 pt-2 pb-12 min-h-screen">
         <section className="mt-12 max-w-7xl mx-auto md:px-8">
@@ -94,6 +94,7 @@ export default function CheckLists() {
             <p className='text-md text-gray-700'>In order to help us evaluate your fit here at ADEX, we strongly encourage you to fill out the skills checklist related to your specialty.</p>
           </div>
           <TabGroup index={activeTabIndex} onIndexChange={setActiveTabIndex} className="mt-10">
+            <h3 className='text-lg font-bold mb-1 text-gray-600'>Degree/Modality:</h3>
             <TabList>
               <Tab className={`px-4 py-2 cursor-pointer rounded-md ${activeTabIndex === 0 ? 'bg-red-700 text-white' : ''}`}>Allied Health Professional</Tab>
               <Tab className={`px-4 py-2 cursor-pointer rounded-md ${activeTabIndex === 1 ? 'bg-red-700  text-white' : ''}`}>RN</Tab>
@@ -181,6 +182,7 @@ export default function CheckLists() {
           </div>
         </section>
       </div>
+
     </div>
   );
 }

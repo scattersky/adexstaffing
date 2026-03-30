@@ -1,0 +1,21 @@
+CREATE TABLE IF NOT EXISTS job_applications (
+  id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  firebase_uid VARCHAR(191) NULL,
+  job_id VARCHAR(64) NOT NULL,
+  job_title VARCHAR(255) NULL,
+  job_city VARCHAR(100) NULL,
+  job_state VARCHAR(50) NULL,
+  first_name VARCHAR(100) NOT NULL,
+  last_name VARCHAR(100) NOT NULL,
+  email VARCHAR(191) NOT NULL,
+  phone VARCHAR(50) NOT NULL,
+  years_experience VARCHAR(50) NOT NULL,
+  states_licensure TEXT NULL,
+  resume_url TEXT NULL,
+  additional_files_urls JSON NULL,
+  referrer_name VARCHAR(191) NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  INDEX idx_job_id (job_id),
+  INDEX idx_email (email),
+  INDEX idx_created_at (created_at)
+);

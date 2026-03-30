@@ -25,13 +25,11 @@ export default function SkillsChecklists() {
   if (!lst) {
     return null;
   }
-
-
-
   const [questions, setQuestions] = useState<Question[]>([]);
   const [loading, setLoading] = useState(true);
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
+
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -76,17 +74,15 @@ export default function SkillsChecklists() {
     );
   }
 
-  if (!user) return null;
+
 
   return (
     <div>
-      <InnerPageTitle title='Skills Checklists' subHeading=''/>
+      <InnerPageTitle title='Skills Checklists'/>
       <ScrollProgressBar />
       <div className="bg-gray-100 pt-2 pb-12">
         <section className="mt-12 max-w-5xl mx-auto md:px-8">
-
-
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-10 ">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-10 ">
           <div className='bg-white rounded-lg p-8 shadow-lg'>
             <h2 className="text-gray-800 text-3xl font-black">
               {decodeURIComponent(lst)} Skills Checklist

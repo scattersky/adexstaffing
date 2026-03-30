@@ -7,11 +7,13 @@ import axios from "axios";
 
 type Role = "candidate" | "recruiter" | "admin" | null;
 
-const AuthContext = createContext<{
+interface AuthContextType {
   user: User | null;
   loading: boolean;
   role: Role;
-}>({
+}
+
+const AuthContext = createContext<AuthContextType>({
   user: null,
   loading: true,
   role: null,
@@ -23,31 +25,33 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [role, setRole] = useState<Role>(null);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
       setUser(user);
       if (user) {
-        try {
-          const res = await axios.get(
-            "https://adextravelnursing.com/api_get_user.php",
-            {
-              params: { uid: user?.uid }
-            }
-          );
-          console.log(res);
-
-          setRole(res.data.role);
-        } catch (err) {
-          console.error("Failed to fetch role:", err);
-          setRole(null);
-        }
+        fetchUserRole(user.uid);
       } else {
         setRole(null);
+        setLoading(false);
       }
-      setLoading(false);
     });
 
     return () => unsubscribe();
   }, []);
+
+  const fetchUserRole = async (uid: string) => {
+    try {
+      const { data } = await axios.get(
+        "https://adextravelnursing.com/api_get_user.php",
+        { params: { uid } }
+      );
+      setRole(data.role);
+    } catch (err) {
+      console.error("Failed to fetch role:", err);
+      setRole(null);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <AuthContext.Provider value={{ user, role, loading }}>
