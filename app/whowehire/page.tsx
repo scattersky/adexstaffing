@@ -7,7 +7,7 @@ export default function WhoWeHirePage() {
 
   return (
     <div>
-      <InnerPageTitle title='Support Contact' subHeading='Get In Touch'/>
+      <InnerPageTitle title='Who We Hire'/>
 
 
 
