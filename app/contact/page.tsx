@@ -42,7 +42,7 @@ export default function ContactPage() {
 
   return (
     <div>
-      <InnerPageTitle title='Support Contact' subHeading='Get In Touch'/>
+      <InnerPageTitle title='Support Contact'/>
 
       <div className="bg-gray-100 pt-2 pb-12">
         <section className="mt-12 max-w-4xl mx-auto md:px-8">
