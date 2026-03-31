@@ -34,11 +34,14 @@ export default function RecruiterNotifications({ recruiterUid }: Props) {
   const [expanded, setExpanded] = useState<{ [key: number]: boolean }>({});
   const [jobsByNotification, setJobsByNotification] = useState<{ [key: number]: any[] }>({});
   const [jobsLoading, setJobsLoading] = useState<{ [key: number]: boolean }>({});
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
   useEffect(() => {
     if (!recruiterUid) return;
 
     const fetchNotifications = async () => {
+      setCurrentPage(1);
       try {
         const res = await axios.get(
           `https://adextravelnursing.com/api_get_recruiter_notifications.php?uid=${recruiterUid}`
@@ -54,6 +57,10 @@ export default function RecruiterNotifications({ recruiterUid }: Props) {
 
     fetchNotifications();
   }, [recruiterUid]);
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [currentPage]);
 
   // 🔥 Toggle + fetch jobs ONLY once
   const toggleDetails = async (n: Notification) => {
@@ -113,9 +120,16 @@ console.log(allJobIds);
   if (loading) return <p>Loading notifications...</p>;
   if (!notifications.length) return <p>No new notifications.</p>;
 
+  const totalPages = Math.ceil(notifications.length / itemsPerPage);
+
+  const paginatedNotifications = notifications.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
   return (
     <div className="space-y-4 w-full">
-      {notifications.map((n) => (
+      {paginatedNotifications.map((n) => (
         <div
           key={n.id}
           className="border py-4 px-6 rounded shadow-sm bg-white dark:bg-gray-800 w-full border-l-4 border-[#004A71]"
@@ -189,6 +203,27 @@ console.log(allJobIds);
           )}
         </div>
       ))}
+      <div className="flex justify-center items-center gap-2 mt-6">
+        <button
+          onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
+          disabled={currentPage === 1}
+          className="px-3 py-1 disabled:opacity-50 bg-gray-300 rounded-md text-gray-700 cursor-pointer"
+        >
+          Prev
+        </button>
+
+        <span className="text-sm">
+          Page {currentPage} of {totalPages}
+        </span>
+
+        <button
+          onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
+          disabled={currentPage === totalPages}
+          className="px-3 py-1 disabled:opacity-50 bg-red-700 rounded-md text-white cursor-pointer"
+        >
+          Next
+        </button>
+      </div>
     </div>
   );
 }

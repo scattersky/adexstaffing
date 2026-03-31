@@ -9,7 +9,7 @@ export default function DashboardRouter() {
   const router = useRouter();
 
   useEffect(() => {
-    if (loading) return; // ⛔ wait for auth to resolve
+    if (loading) return;
 
     if (!user) {
       router.replace("/login");

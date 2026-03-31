@@ -17,16 +17,17 @@ import {
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useAuth } from "@/context/AuthContext";
-import {MagicCard} from "@/components/magicui/magic-card";
-import Link from "next/link";
-import {ImInfo} from "react-icons/im";
-import {DotLoader} from "react-spinners";
+import { createUserWithEmailAndPassword } from "firebase/auth";
 import {Skeleton} from "primereact/skeleton";
 import {Slide, toast, ToastContainer} from "react-toastify";
 import {MultiSelect} from "primereact/multiselect";
 import {FaUserCheck} from "react-icons/fa";
 import { Badge } from 'primereact/badge';
 import {MatchedJobCard} from "@/components/MatchedJobCard";
+import { Password } from 'primereact/password';
+import {InputSwitch} from "primereact/inputswitch";
+import {RadioButton} from "primereact/radiobutton";
+import { auth } from "@/lib/firebase";
 
 interface UserProfile {
   id: number;
@@ -45,14 +46,20 @@ interface AddCandidateForm {
   last_name: string;
   email: string;
   phone: string;
+  city: string;
+  state: string;
+  password: string;
   preferred_location: string[];
   preferred_shift: string[];
   degree: string;
   specialty: string[];
+  states_licensure: string[];
+  years_experience: string;
   misc_notes: string;
   recruiter_name: string;
   recruiter_email: string;
   role: string;
+  email_notifications: number;
   recruiter_firebase_uid: string | undefined;
 }
 
@@ -77,14 +84,12 @@ export default function RecruiterCandidatesList() {
 
   useEffect(() => {
     if (!user) return;
-
     axios
       .get("https://adextravelnursing.com/api_get_user.php", {
         params: { uid: user.uid }
       })
       .then((response) => {
         setUserData(response.data);
-
       })
       .finally(() => {
         setLoading(false);
@@ -116,7 +121,6 @@ export default function RecruiterCandidatesList() {
       console.error(err);
     }
   };
-
 
   const fetchMatchedJobs = async (candidate: any) => {
     setJobsLoading(true);
@@ -203,8 +207,6 @@ export default function RecruiterCandidatesList() {
   useEffect(() => {
     fetchSpecialties();
   }, []);
-
-
   const shiftOptions = [
     { label: "Days", value: "Days" },
     { label: "Nights", value: "Nights" },
@@ -264,6 +266,7 @@ export default function RecruiterCandidatesList() {
     { label: "Wisconsin", value: "WI" },
     { label: "Wyoming", value: "WY" }
   ];
+
   // Add New Candidate
   const [addCandidateForm, setAddCandidateForm] = useState<AddCandidateForm>({
     id: 0,
@@ -272,14 +275,20 @@ export default function RecruiterCandidatesList() {
     last_name: '',
     email: '',
     phone: '',
+    city: '',
+    state: '',
+    password: '',
     preferred_location: [],
     preferred_shift: [],
     degree: '',
     specialty: [],
+    states_licensure: [],
+    years_experience: '',
     misc_notes: '',
     recruiter_name: '',
     recruiter_email: '',
     role: 'candidate',
+    email_notifications: 1,
     recruiter_firebase_uid: user?.uid,
   });
   const handleAddCandidateFormChange = (e: any) => {
@@ -304,34 +313,29 @@ export default function RecruiterCandidatesList() {
       [e.target.name]: values
     }));
   };
+
   const handleUpdateAddCandidate = async (e: React.FormEvent) => {
     e.preventDefault();
     setAddCandidateFormLoading(true);
 
     try {
-      // Prepare the payload
       const payload = {
         ...addCandidateForm,
-        recruiter_firebase_uid: user?.uid, // ensure UID is always included
-        specialty: addCandidateForm.specialty, // array
-        preferred_location: addCandidateForm.preferred_location, // array
-        preferred_shift: addCandidateForm.preferred_shift,
+        recruiter_firebase_uid: user?.uid,
         recruiter_name: userData?.first_name,
         recruiter_email: userData?.email,
       };
 
       const res = await axios.post(
-        'https://adextravelnursing.com/api_add_new_candidate.php',
+        "https://adextravelnursing.com/api_recruiter_add_candidate.php",
         payload,
         {
-          headers: {
-            'Content-Type': 'application/json', // ensure server reads JSON
-          },
+          headers: { "Content-Type": "application/json" },
         }
       );
 
-      if (res.data.status === 'success') {
-        toast.success(res.data.message,{
+      if (res.data.status === "success") {
+        toast.success('Candidate created successfully!',{
           position: "bottom-right",
           autoClose: 3000,
           hideProgressBar: false,
@@ -343,38 +347,31 @@ export default function RecruiterCandidatesList() {
           transition: Slide,
         });
 
-        // Reset the form
         setAddCandidateForm({
           id: 0,
-          firebase_uid: '',
-          first_name: '',
-          last_name: '',
-          email: '',
-          phone: '',
+          firebase_uid: "",
+          first_name: "",
+          last_name: "",
+          email: "",
+          phone: "",
+          city: "",
+          state: "",
+          password: "",
           preferred_location: [],
           preferred_shift: [],
-          degree: '',
+          degree: "",
           specialty: [],
-          misc_notes: '',
-          recruiter_name: '',
-          recruiter_email: '',
-          role: 'candidate',
+          states_licensure: [],
+          years_experience: "",
+          misc_notes: "",
+          recruiter_name: "",
+          recruiter_email: "",
+          role: "candidate",
+          email_notifications: 1,
           recruiter_firebase_uid: user?.uid,
         });
 
-        fetchCandidates(); // refresh candidate list
-      } else if (res.data.status === 'exists') {
-        toast.warning('Candidate already exists!',{
-          position: "bottom-right",
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: false,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "colored",
-          transition: Slide,
-        });
+        fetchCandidates();
       } else {
         toast.error(res.data.message,{
           position: "bottom-right",
@@ -390,7 +387,7 @@ export default function RecruiterCandidatesList() {
       }
     } catch (err: any) {
       console.error(err);
-      toast.error(err, {
+      toast.error("Something went wrong",{
         position: "bottom-right",
         autoClose: 3000,
         hideProgressBar: false,
@@ -456,22 +453,20 @@ export default function RecruiterCandidatesList() {
           <Tab className={`px-4 py-2 cursor-pointer rounded-md ${activeTabIndex === 1 ? 'bg-sky-900  text-white' : ''}`} disabled={!selectedCandidate}>Details</Tab>
           <Tab className={`px-4 py-2 cursor-pointer rounded-md ${activeTabIndex === 2 ? 'bg-sky-900  text-white' : ''}`}>Add New</Tab>
         </TabList>
-
         <TabPanels>
           {/* Candidates List */}
           <TabPanel>
             <div className='border rounded-md border-gray-100 w-full p-4 min-h-40 bg-white shadow'>
               <h2 className="text-lg font-bold">Candidates</h2>
-
-            {candidatesLoading ? (
-              <div className="flex justify-center items-center text-center h-64 w-full">
-                <div className="flex flex-col flex-nowrap justify-center items-center text-center h-full w-full">
-                  <Skeleton width="100%" className="mb-4 min-h-10 min-w-full" />
-                  <Skeleton width="100%" className="mb-4 min-h-10 min-w-full" />
-                  <Skeleton width="100%" className="mb-4 min-h-10 min-w-full" />
+              {candidatesLoading ? (
+                <div className="flex justify-center items-center text-center h-64 w-full">
+                  <div className="flex flex-col flex-nowrap justify-center items-center text-center h-full w-full">
+                    <Skeleton width="100%" className="mb-4 min-h-10 min-w-full" />
+                    <Skeleton width="100%" className="mb-4 min-h-10 min-w-full" />
+                    <Skeleton width="100%" className="mb-4 min-h-10 min-w-full" />
+                  </div>
                 </div>
-              </div>
-            ) : (
+              ) : (
               <Table className="mt-10">
                 <TableHead>
                   <TableRow className="border-b border-tremor-border dark:border-dark-tremor-border">
@@ -504,7 +499,6 @@ export default function RecruiterCandidatesList() {
             )}
             </div>
           </TabPanel>
-
           {/* Candidate Details */}
           <TabPanel>
             {selectedCandidate ? (
@@ -606,19 +600,19 @@ export default function RecruiterCandidatesList() {
               <p>Select a candidate to view details.</p>
             )}
           </TabPanel>
-
           {/* Add New Candidate */}
           <TabPanel>
             <div className='space-y-2 border rounded-md border-gray-100  p-4 min-h-40 bg-white shadow'>
               <div className="flex flex-col gap-1">
-                <h2 className="text-lg font-bold">Add New Candidate</h2>
-                <span className="text-xs text-gray-500">(All Fields Required)</span>
+                <h2 className="text-3xl font-bold">Add New Candidate</h2>
               </div>
-
             <form
               className='mt-4 flex flex-col gap-5 w-full'
               onSubmit={handleUpdateAddCandidate}
             >
+              <div className="flex justify-center items-center px-2 pt-1 pb-2 w-45 rounded-md bg-linear-to-br from-cyan-600 to-cyan-700 -ml-0.5 mt-4 -mb-2">
+                <span className="text-white text-[11px] leading-3 mt-1  font-medium uppercase tracking-widest">BASIC INFORMATION</span>
+              </div>
               <div className='flex flex-row gap-2 w-full'>
                 <div className='flex flex-col w-full'>
                   <label
@@ -632,7 +626,7 @@ export default function RecruiterCandidatesList() {
                     name='first_name'
                     value={addCandidateForm?.first_name}
                     onChange={handleAddCandidateFormChange}
-                    className='w-full border p-2 rounded '
+                    className='w-full border p-2 rounded border-gray-400'
                     required
                   />
                 </div>
@@ -648,29 +642,13 @@ export default function RecruiterCandidatesList() {
                     name='last_name'
                     value={addCandidateForm?.last_name}
                     onChange={handleAddCandidateFormChange}
-                    className='w-full border p-2 rounded'
+                    className='w-full border p-2 rounded border-gray-400'
                     required
                   />
                 </div>
               </div>
 
               <div className='flex flex-row gap-2 w-full'>
-                <div className='flex flex-col w-full'>
-                  <label
-                    className='text-gray-700 p-1 block'
-                    htmlFor='username'
-                  >
-                    Email
-                  </label>
-                  <input
-                    type='email'
-                    name='email'
-                    value={addCandidateForm?.email}
-                    onChange={handleAddCandidateFormChange}
-                    className='w-full border p-2 rounded'
-                    required
-                  />
-                </div>
                 <div className='flex flex-col w-full'>
                   <label
                     className='text-gray-700 p-1 block'
@@ -683,12 +661,94 @@ export default function RecruiterCandidatesList() {
                     name='phone'
                     value={addCandidateForm?.phone}
                     onChange={handleAddCandidateFormChange}
-                    className='w-full border p-2 rounded'
+                    className='w-full border p-2 rounded border-gray-400'
                     required
+                  />
+                </div>
+                <div className='flex flex-col w-full'>
+                  <label
+                    className='text-gray-700 p-1 block'
+                    htmlFor='username'
+                  >
+                    Email
+                  </label>
+                  <input
+                    type='email'
+                    name='email'
+                    value={addCandidateForm?.email}
+                    onChange={handleAddCandidateFormChange}
+                    className='w-full border p-2 rounded border-gray-400'
+                    required
+                  />
+                </div>
+                <div className='flex flex-col w-full'>
+                  <label
+                    className='text-gray-700 p-1 block'
+                    htmlFor='city'
+                  >
+                    Password
+                  </label>
+                  <Password
+                    name='password'
+                    value={addCandidateForm?.password}
+                    onChange={handleAddCandidateFormChange}
+                    toggleMask
+
+                    pt={{
+                      root: { className: "p-0 text-sm leading-none w-full border-gray-400" },
+                      input: { className: "border-gray-400" },
+                    }}
                   />
                 </div>
               </div>
 
+              <div className='flex flex-row gap-2 w-full'>
+                <div className='flex flex-col w-full'>
+                  <label
+                    className='text-gray-700 p-1 block'
+                    htmlFor='city'
+                  >
+                    City
+                  </label>
+                  <input
+                    type='text'
+                    name='city'
+                    value={addCandidateForm?.city}
+                    onChange={handleAddCandidateFormChange}
+                    className='w-full border p-2 rounded border-gray-400'
+                    required
+                  />
+                </div>
+                <div className='flex flex-col w-full'>
+                  <label
+                    className='text-gray-700 p-1 block'
+                    htmlFor='state'
+                  >
+                    State
+                  </label>
+                  <select
+                    name='state'
+                    value={addCandidateForm?.state}
+                    required
+                    onChange={handleAddCandidateFormChange}
+                    className='w-full border p-2 rounded bg-white border-gray-400'
+                  >
+                    <option value="">Select State...</option>
+                    {stateOptions.map((state) => (
+                      <option key={state.value} value={state.value}>
+                        {state.label}
+                      </option>
+                    ))}
+                  </select>
+              </div>
+              </div>
+
+
+              <div className="flex justify-center items-center px-2 pt-1 pb-2 w-45 rounded-md bg-linear-to-br from-cyan-600 to-cyan-700 -ml-0.5 mt-6 -mb-2">
+                <span className="text-white text-[11px] leading-3 mt-1  font-medium uppercase tracking-widest">WORK EXPERIENCE</span>
+              </div>
+
+              {/*DEGREE / MODALITY*/}
               <div className='flex flex-row gap-2 w-full'>
                 <div className='flex flex-col w-1/2'>
                   <label
@@ -702,7 +762,7 @@ export default function RecruiterCandidatesList() {
                     value={addCandidateForm?.degree}
                     required
                     onChange={handleAddCandidateFormChange}
-                    className='w-full border p-2 rounded bg-white'
+                    className='w-full border p-2 rounded bg-white border-gray-400'
                   >
                     <option value=''>Select Degree</option>
                     <option value='RN'>RN</option>
@@ -713,8 +773,7 @@ export default function RecruiterCandidatesList() {
                 </div>
 
               </div>
-
-
+              {/*SPECIALTIES MULTISELECT*/}
               <div className="flex flex-col w-full">
                 <label className="text-gray-700 p-1 block">
                   Specialty/Specialties
@@ -735,9 +794,68 @@ export default function RecruiterCandidatesList() {
                   filter
                   required
                   showClear
+                  pt={{
+                    root: { className: "p-0 text-sm leading-none w-full border-gray-400" },
+                  }}
+                />
+              </div>
+              {/*YEARS OF EXPERIENCE*/}
+              <div className='flex flex-row gap-2 w-full'>
+                <div className='flex flex-col w-1/2'>
+                  <label
+                    className='text-gray-700 p-1 block'
+                    htmlFor='years_experience'
+                  >
+                    Years of Experience
+                  </label>
+                  <select
+                    name='years_experience'
+                    value={addCandidateForm?.years_experience}
+                    required
+                    onChange={handleAddCandidateFormChange}
+                    className='w-full border p-2 rounded bg-white border-gray-400'
+                  >
+                    <option value="">Select Years of Experience</option>
+                    <option value="0-1 Years">0-1 Years</option>
+                    <option value="2-3 Years">2-3 Years</option>
+                    <option value="4-5 Years">4-5 Years</option>
+                    <option value="6-10 Years">6-10 Years</option>
+                    <option value="10+ Years">10+ Years</option>
+                  </select>
+                </div>
+
+              </div>
+              {/*STATES LICENSURE MULTISELECT */}
+              <div className="flex flex-col w-full">
+                <label className="text-gray-700 p-1 block">
+                  States in which licensure is held
+                </label>
+
+                <MultiSelect
+                  value={addCandidateForm.states_licensure}
+                  options={stateOptions}
+                  onChange={(e) =>
+                    setAddCandidateForm({
+                      ...addCandidateForm,
+                      states_licensure: e.value
+                    })
+                  }
+                  placeholder="Select States"
+                  className="w-full"
+                  display="chip"
+                  filter
+                  required
+                  showClear
+                  pt={{
+                    root: { className: "p-0 text-sm leading-none w-full border-gray-400" },
+                    label: { className: "p-0 text-sm leading-none w-full border-gray-400" },
+                  }}
                 />
               </div>
 
+              <div className="flex justify-center items-center px-2 pt-1 pb-2 w-45 rounded-md bg-linear-to-br from-cyan-600 to-cyan-700 -ml-0.5 mt-6 -mb-2">
+                <span className="text-white text-[11px] leading-3 mt-1  font-medium uppercase tracking-widest">JOB MATCHING</span>
+              </div>
               <div className="flex flex-col w-full">
                 <label className="text-gray-700 p-1 block">
                   Preferred Shift(s)
@@ -782,6 +900,45 @@ export default function RecruiterCandidatesList() {
                 />
               </div>
 
+              <div className="flex flex-col w-full">
+                <label className="text-gray-700 p-1 block font-bold mb-2">
+                 Enable Email Notifications
+                </label>
+                <div className="flex flex-wrap items-center leading-5 gap-3">
+                  <div className="flex align-items-center">
+                    <RadioButton
+                      checked
+                      inputId="email_notifications_toggle1"
+                      name="email_notifications"
+                      value="1"
+                      onChange={(e) =>
+                        setAddCandidateForm({
+                          ...addCandidateForm,
+                          email_notifications: e.value
+                        })
+                      }
+                      />
+                    <label htmlFor="email_notifications_toggle1" className="ml-2">Enabled</label>
+                  </div>
+                  <div className="flex align-items-center">
+                    <RadioButton
+                      inputId="email_notifications_toggle1"
+                      name="email_notifications"
+                      value="0"
+                      onChange={(e) =>
+                        setAddCandidateForm({
+                          ...addCandidateForm,
+                          email_notifications: e.value
+                        })
+                      }
+                    />
+                    <label htmlFor="email_notifications_toggle1" className="ml-2">Disabled</label>
+                  </div>
+
+
+                </div>
+
+              </div>
 
               <div className='flex justify-end gap-[20px]'>
                 <button

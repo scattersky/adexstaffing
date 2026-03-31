@@ -129,13 +129,11 @@ export default function Register() {
     setLoading(true);
 
     try {
-      // 1️⃣ Firebase auth
       const userCredential = await createUserWithEmailAndPassword(
         auth,
         data.email,
         data.password
       );
-
       const uid = userCredential.user.uid;
 
       const formData = new FormData();
