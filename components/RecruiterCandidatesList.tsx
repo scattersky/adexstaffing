@@ -28,6 +28,7 @@ import { Password } from 'primereact/password';
 import {InputSwitch} from "primereact/inputswitch";
 import {RadioButton} from "primereact/radiobutton";
 import { auth } from "@/lib/firebase";
+import CandidateChecklistResults from "@/components/CandidateChecklistResults";
 
 interface UserProfile {
   id: number;
@@ -81,6 +82,7 @@ export default function RecruiterCandidatesList() {
   const [editCandidateForm, setEditCandidateForm] = useState<AddCandidateForm | null>(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [candidateToDelete, setCandidateToDelete] = useState<{ id: number; name: string } | null>(null);
+  const [skillsChecklistsVisible, setSkillsChecklistsVisible] = useState(false);
 
   useEffect(() => {
     if (!user) return;
@@ -531,6 +533,26 @@ export default function RecruiterCandidatesList() {
                         >
                           Edit Candidate
                         </Button>
+                        {skillsChecklistsVisible ? (
+                          <Button
+                            className="bg-cyan-600 hover:bg-cyan-500 text-white px-4 py-2 rounded-md cursor-pointer"
+                            onClick={() => {
+                              setSkillsChecklistsVisible(false);
+                            }}
+                          >
+                            Matched Jobs
+                          </Button>
+                        ):(
+                          <Button
+                            className="bg-cyan-600 hover:bg-cyan-500 text-white px-4 py-2 rounded-md cursor-pointer"
+                            onClick={() => {
+                              setSkillsChecklistsVisible(true);
+                            }}
+                          >
+                            Skills Checklists
+                          </Button>
+                        )}
+
                         <Button
                           className="bg-red-700 hover:bg-red-600 text-white px-4 py-2 rounded-md cursor-pointer"
                           onClick={() => {
@@ -545,55 +567,63 @@ export default function RecruiterCandidatesList() {
                   </div>
                 </div>
 
+
                 {/* Matching Jobs Grouped by Strength */}
                 <div className="">
-                  <h4 className="font-bold text-2xl mb-2">Matching Jobs</h4>
-                  {jobsLoading ? (
-                    <div className="flex flex-col flex-nowrap justify-center items-center text-center h-full w-full">
-                      <Skeleton width="100%" className="mb-4 min-h-30 min-w-full" />
-                      <Skeleton width="100%" className="mb-4 min-h-30 min-w-full" />
-                      <Skeleton width="100%" className="mb-4 min-h-30 min-w-full" />
-                    </div>
-                  ) : matchedJobs.length === 0 ? (
-                    <p>No matching jobs found.</p>
+                  {skillsChecklistsVisible ? (
+                    <CandidateChecklistResults candidateUid={selectedCandidate.firebase_uid} candidateName={selectedCandidate.first_name+' '+selectedCandidate.last_name}/>
                   ) : (
                     <>
-                      <TabGroup index={activeMatchesTabIndex} onIndexChange={setActiveMatchesTabIndex}>
-                        <TabList className='mb-6'>
-                          <Tab className={`px-4 py-2 text-sm cursor-pointer rounded-md ${activeMatchesTabIndex === 0 ? 'bg-[#21C55E] text-white' : ''}`}>Perfect Matches</Tab>
-                          <Tab className={`px-4 py-2 text-sm cursor-pointer rounded-md ${activeMatchesTabIndex === 1 ? 'bg-[#F59E0B] text-white' : ''}`}>Strong Matches</Tab>
-                          <Tab className={`px-4 py-2 text-sm cursor-pointer rounded-md ${activeMatchesTabIndex === 2 ? 'bg-[#FA7315] text-white' : ''}`}>Possible Matches</Tab>
-                          <Tab className={`px-4 py-2 text-sm cursor-pointer rounded-md ${activeMatchesTabIndex === 3 ? 'bg-[#EF4444] text-white' : ''}`}>Weak Matches</Tab>
-                        </TabList>
-                        <TabPanels>
-                          {/* Perfect Matches */}
-                          <TabPanel>
-                            {matchedJobs.filter(job => job.matchScore >= 9).map(job => (
-                              <MatchedJobCard key={job.job_id} job={job} safeArray={safeArray} getMatchLabel={getMatchLabel} />
-                            ))}
-                          </TabPanel>
-                          {/* Strong Matches */}
-                          <TabPanel>
-                            {matchedJobs.filter(job => job.matchScore >= 7 && job.matchScore < 9).map(job => (
-                              <MatchedJobCard key={job.job_id} job={job} safeArray={safeArray} getMatchLabel={getMatchLabel} />
-                            ))}
-                          </TabPanel>
-                          {/* Possible Matches */}
-                          <TabPanel>
-                            {matchedJobs.filter(job => job.matchScore >= 4 && job.matchScore < 7).map(job => (
-                              <MatchedJobCard key={job.job_id} job={job} safeArray={safeArray} getMatchLabel={getMatchLabel} />
-                            ))}
-                          </TabPanel>
-                          {/* Weak Matches */}
-                          <TabPanel>
-                            {matchedJobs.filter(job => job.matchScore < 4).map(job => (
-                              <MatchedJobCard key={job.job_id} job={job} safeArray={safeArray} getMatchLabel={getMatchLabel} />
-                            ))}
-                          </TabPanel>
-                        </TabPanels>
-                      </TabGroup>
+                      <h4 className="font-bold text-2xl mb-2">Matching Jobs</h4>
+                      {jobsLoading ? (
+                        <div className="flex flex-col flex-nowrap justify-center items-center text-center h-full w-full">
+                          <Skeleton width="100%" className="mb-4 min-h-30 min-w-full" />
+                          <Skeleton width="100%" className="mb-4 min-h-30 min-w-full" />
+                          <Skeleton width="100%" className="mb-4 min-h-30 min-w-full" />
+                        </div>
+                      ) : matchedJobs.length === 0 ? (
+                        <p>No matching jobs found.</p>
+                      ) : (
+                        <>
+                          <TabGroup index={activeMatchesTabIndex} onIndexChange={setActiveMatchesTabIndex}>
+                            <TabList className='mb-6'>
+                              <Tab className={`px-4 py-2 text-sm cursor-pointer rounded-md ${activeMatchesTabIndex === 0 ? 'bg-[#21C55E] text-white' : ''}`}>Perfect Matches</Tab>
+                              <Tab className={`px-4 py-2 text-sm cursor-pointer rounded-md ${activeMatchesTabIndex === 1 ? 'bg-[#F59E0B] text-white' : ''}`}>Strong Matches</Tab>
+                              <Tab className={`px-4 py-2 text-sm cursor-pointer rounded-md ${activeMatchesTabIndex === 2 ? 'bg-[#FA7315] text-white' : ''}`}>Possible Matches</Tab>
+                              <Tab className={`px-4 py-2 text-sm cursor-pointer rounded-md ${activeMatchesTabIndex === 3 ? 'bg-[#EF4444] text-white' : ''}`}>Weak Matches</Tab>
+                            </TabList>
+                            <TabPanels>
+                              {/* Perfect Matches */}
+                              <TabPanel>
+                                {matchedJobs.filter(job => job.matchScore >= 9).map(job => (
+                                  <MatchedJobCard key={job.job_id} job={job} safeArray={safeArray} getMatchLabel={getMatchLabel} />
+                                ))}
+                              </TabPanel>
+                              {/* Strong Matches */}
+                              <TabPanel>
+                                {matchedJobs.filter(job => job.matchScore >= 7 && job.matchScore < 9).map(job => (
+                                  <MatchedJobCard key={job.job_id} job={job} safeArray={safeArray} getMatchLabel={getMatchLabel} />
+                                ))}
+                              </TabPanel>
+                              {/* Possible Matches */}
+                              <TabPanel>
+                                {matchedJobs.filter(job => job.matchScore >= 4 && job.matchScore < 7).map(job => (
+                                  <MatchedJobCard key={job.job_id} job={job} safeArray={safeArray} getMatchLabel={getMatchLabel} />
+                                ))}
+                              </TabPanel>
+                              {/* Weak Matches */}
+                              <TabPanel>
+                                {matchedJobs.filter(job => job.matchScore < 4).map(job => (
+                                  <MatchedJobCard key={job.job_id} job={job} safeArray={safeArray} getMatchLabel={getMatchLabel} />
+                                ))}
+                              </TabPanel>
+                            </TabPanels>
+                          </TabGroup>
+                        </>
+                      )}
                     </>
                   )}
+
                 </div>
               </div>
             ) : (

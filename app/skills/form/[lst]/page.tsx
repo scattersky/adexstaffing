@@ -10,6 +10,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 import { useParams } from "next/navigation";
 import ScrollProgressBar from "@/components/ScrollProgressBar";
+import {Slide, toast} from "react-toastify";
 
 type Question = {
   id: number;
@@ -56,14 +57,41 @@ export default function SkillsChecklists() {
     return acc;
   }, {});
 
-  const onSubmit = (data: any) => {
+  const onSubmit = async (data: any) => {
     console.log(data);
-
-    axios.post("https://adextravelnursing.com/api_save_skills.php", {
-      firebase_uid: user?.uid,
-      list: lst,
-      responses: data
-    });
+    try {
+      await axios.post("https://adextravelnursing.com/api_save_skills.php", {
+        firebase_uid: user?.uid,
+        list: lst,
+        responses: data
+      });
+      toast.success('Skills Checklist Submitted Successfully!',{
+        position: "bottom-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: false,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+        transition: Slide,
+      });
+    } catch (err) {
+      console.error(err);
+      toast.error(`Error Storing Skills Checklist. Please try again later. Error: ${err}`,{
+        position: "bottom-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: false,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+        transition: Slide,
+      });
+    } finally {
+     router.push("/");
+    }
   };
 
   if (authLoading || loading) {
