@@ -988,142 +988,151 @@ export default function RecruiterCandidatesList() {
       {editCandidateModalOpen && editCandidateForm && (
         <div className="fixed inset-0 flex items-center justify-center bg-[rgba(0,0,0,0.7)] z-50">
           <div className="bg-white p-6 rounded-md w-full max-w-3xl space-y-4">
-            <h3 className="text-lg font-bold">Edit Candidate</h3>
-
-            <input
-              type="text"
-              placeholder="First Name"
-              name="first_name"
-              value={editCandidateForm.first_name}
-              onChange={(e) =>
-                setEditCandidateForm({ ...editCandidateForm, first_name: e.target.value })
-              }
-              className="border p-2 w-full rounded"
-            />
-
-            <input
-              type="text"
-              placeholder="Last Name"
-              name="last_name"
-              value={editCandidateForm.last_name}
-              onChange={(e) =>
-                setEditCandidateForm({ ...editCandidateForm, last_name: e.target.value })
-              }
-              className="border p-2 w-full rounded"
-            />
-
-            <input
-              type="email"
-              placeholder="Email"
-              name="email"
-              value={editCandidateForm.email}
-              onChange={(e) =>
-                setEditCandidateForm({ ...editCandidateForm, email: e.target.value })
-              }
-              className="border p-2 w-full rounded"
-            />
-
-            <input
-              type="tel"
-              placeholder="Phone"
-              name="phone"
-              value={editCandidateForm.phone}
-              onChange={(e) =>
-                setEditCandidateForm({ ...editCandidateForm, phone: e.target.value })
-              }
-              className="border p-2 w-full rounded"
-            />
-
-            <MultiSelect
-              value={editCandidateForm.specialty}
-              options={specialtyOptions}
-              onChange={(e) =>
-                setEditCandidateForm({ ...editCandidateForm, specialty: e.value })
-              }
-              placeholder="Select Specialties"
-              className="w-full"
-              display="chip"
-              filter
-              showClear
-            />
-
-            <MultiSelect
-              value={editCandidateForm.preferred_shift}
-              options={shiftOptions}
-              onChange={(e) =>
-                setEditCandidateForm({ ...editCandidateForm, preferred_shift: e.value })
-              }
-              placeholder="Select Shifts"
-              className="w-full"
-              display="chip"
-            />
-
-            <MultiSelect
-              value={editCandidateForm.preferred_location}
-              options={stateOptions}
-              onChange={(e) =>
-                setEditCandidateForm({ ...editCandidateForm, preferred_location: e.value })
-              }
-              placeholder="Select States"
-              className="w-full"
-              display="chip"
-              filter
-              showClear
-            />
-
-            <div className="flex justify-end gap-2 mt-4">
-              <Button
+            <p>Under Maintenance</p>
+            <Button
                 className="bg-gray-400 hover:bg-gray-500 text-white px-4 py-2 rounded-md"
-                onClick={() => setEditCandidateModalOpen(false)}
-              >
-                Cancel
-              </Button>
-              <Button
-                className="bg-sky-900 hover:bg-sky-800 text-white px-4 py-2 rounded-md"
-                onClick={async () => {
-                  if (!editCandidateForm) return;
-                  try {
-                    await axios.post(
-                      "https://adextravelnursing.com/api_update_candidate.php",
-                      editCandidateForm,
-                      { headers: { "Content-Type": "application/json" } }
-                    );
-                    toast.success('Candidate updated successfully!',{
-                      position: "bottom-right",
-                      autoClose: 3000,
-                      hideProgressBar: false,
-                      closeOnClick: false,
-                      pauseOnHover: true,
-                      draggable: true,
-                      progress: undefined,
-                      theme: "colored",
-                      transition: Slide,
-                    });
-                    setEditCandidateModalOpen(false);
-                    fetchCandidates(); // refresh list
-                    if (selectedCandidate?.id === editCandidateForm.id) {
-                      setSelectedCandidate(editCandidateForm); // update details view
-                    }
-                  } catch (err) {
-                    console.error(err);
-                    toast.error('Failed to update candidate.',{
-                      position: "bottom-right",
-                      autoClose: 3000,
-                      hideProgressBar: false,
-                      closeOnClick: false,
-                      pauseOnHover: true,
-                      draggable: true,
-                      progress: undefined,
-                      theme: "colored",
-                      transition: Slide,
-                    });
-                  }
-                }}
-              >
-                Save
-              </Button>
-            </div>
+              onClick={() => setEditCandidateModalOpen(false)}
+            >
+                 Close
+            </Button>
           </div>
+          {/*<div className="bg-white p-6 rounded-md w-full max-w-3xl space-y-4">*/}
+          {/*  <h3 className="text-lg font-bold">Edit Candidate</h3>*/}
+
+          {/*  <input*/}
+          {/*    type="text"*/}
+          {/*    placeholder="First Name"*/}
+          {/*    name="first_name"*/}
+          {/*    value={editCandidateForm.first_name}*/}
+          {/*    onChange={(e) =>*/}
+          {/*      setEditCandidateForm({ ...editCandidateForm, first_name: e.target.value })*/}
+          {/*    }*/}
+          {/*    className="border p-2 w-full rounded"*/}
+          {/*  />*/}
+
+          {/*  <input*/}
+          {/*    type="text"*/}
+          {/*    placeholder="Last Name"*/}
+          {/*    name="last_name"*/}
+          {/*    value={editCandidateForm.last_name}*/}
+          {/*    onChange={(e) =>*/}
+          {/*      setEditCandidateForm({ ...editCandidateForm, last_name: e.target.value })*/}
+          {/*    }*/}
+          {/*    className="border p-2 w-full rounded"*/}
+          {/*  />*/}
+
+          {/*  <input*/}
+          {/*    type="email"*/}
+          {/*    placeholder="Email"*/}
+          {/*    name="email"*/}
+          {/*    value={editCandidateForm.email}*/}
+          {/*    onChange={(e) =>*/}
+          {/*      setEditCandidateForm({ ...editCandidateForm, email: e.target.value })*/}
+          {/*    }*/}
+          {/*    className="border p-2 w-full rounded"*/}
+          {/*  />*/}
+
+          {/*  <input*/}
+          {/*    type="tel"*/}
+          {/*    placeholder="Phone"*/}
+          {/*    name="phone"*/}
+          {/*    value={editCandidateForm.phone}*/}
+          {/*    onChange={(e) =>*/}
+          {/*      setEditCandidateForm({ ...editCandidateForm, phone: e.target.value })*/}
+          {/*    }*/}
+          {/*    className="border p-2 w-full rounded"*/}
+          {/*  />*/}
+
+          {/*  <MultiSelect*/}
+          {/*    value={editCandidateForm.specialty}*/}
+          {/*    options={specialtyOptions}*/}
+          {/*    onChange={(e) =>*/}
+          {/*      setEditCandidateForm({ ...editCandidateForm, specialty: e.value })*/}
+          {/*    }*/}
+          {/*    placeholder="Select Specialties"*/}
+          {/*    className="w-full"*/}
+          {/*    display="chip"*/}
+          {/*    filter*/}
+          {/*    showClear*/}
+          {/*  />*/}
+
+          {/*  <MultiSelect*/}
+          {/*    value={editCandidateForm.preferred_shift}*/}
+          {/*    options={shiftOptions}*/}
+          {/*    onChange={(e) =>*/}
+          {/*      setEditCandidateForm({ ...editCandidateForm, preferred_shift: e.value })*/}
+          {/*    }*/}
+          {/*    placeholder="Select Shifts"*/}
+          {/*    className="w-full"*/}
+          {/*    display="chip"*/}
+          {/*  />*/}
+
+          {/*  <MultiSelect*/}
+          {/*    value={editCandidateForm.preferred_location}*/}
+          {/*    options={stateOptions}*/}
+          {/*    onChange={(e) =>*/}
+          {/*      setEditCandidateForm({ ...editCandidateForm, preferred_location: e.value })*/}
+          {/*    }*/}
+          {/*    placeholder="Select States"*/}
+          {/*    className="w-full"*/}
+          {/*    display="chip"*/}
+          {/*    filter*/}
+          {/*    showClear*/}
+          {/*  />*/}
+
+          {/*  <div className="flex justify-end gap-2 mt-4">*/}
+          {/*    <Button*/}
+          {/*      className="bg-gray-400 hover:bg-gray-500 text-white px-4 py-2 rounded-md"*/}
+          {/*      onClick={() => setEditCandidateModalOpen(false)}*/}
+          {/*    >*/}
+          {/*      Cancel*/}
+          {/*    </Button>*/}
+          {/*    <Button*/}
+          {/*      className="bg-sky-900 hover:bg-sky-800 text-white px-4 py-2 rounded-md"*/}
+          {/*      onClick={async () => {*/}
+          {/*        if (!editCandidateForm) return;*/}
+          {/*        try {*/}
+          {/*          await axios.post(*/}
+          {/*            "https://adextravelnursing.com/api_update_candidate.php",*/}
+          {/*            editCandidateForm,*/}
+          {/*            { headers: { "Content-Type": "application/json" } }*/}
+          {/*          );*/}
+          {/*          toast.success('Candidate updated successfully!',{*/}
+          {/*            position: "bottom-right",*/}
+          {/*            autoClose: 3000,*/}
+          {/*            hideProgressBar: false,*/}
+          {/*            closeOnClick: false,*/}
+          {/*            pauseOnHover: true,*/}
+          {/*            draggable: true,*/}
+          {/*            progress: undefined,*/}
+          {/*            theme: "colored",*/}
+          {/*            transition: Slide,*/}
+          {/*          });*/}
+          {/*          setEditCandidateModalOpen(false);*/}
+          {/*          fetchCandidates(); // refresh list*/}
+          {/*          if (selectedCandidate?.id === editCandidateForm.id) {*/}
+          {/*            setSelectedCandidate(editCandidateForm); // update details view*/}
+          {/*          }*/}
+          {/*        } catch (err) {*/}
+          {/*          console.error(err);*/}
+          {/*          toast.error('Failed to update candidate.',{*/}
+          {/*            position: "bottom-right",*/}
+          {/*            autoClose: 3000,*/}
+          {/*            hideProgressBar: false,*/}
+          {/*            closeOnClick: false,*/}
+          {/*            pauseOnHover: true,*/}
+          {/*            draggable: true,*/}
+          {/*            progress: undefined,*/}
+          {/*            theme: "colored",*/}
+          {/*            transition: Slide,*/}
+          {/*          });*/}
+          {/*        }*/}
+          {/*      }}*/}
+          {/*    >*/}
+          {/*      Save*/}
+          {/*    </Button>*/}
+          {/*  </div>*/}
+          {/*</div>*/}
         </div>
       )}
       {isDeleteModalOpen && candidateToDelete && (
